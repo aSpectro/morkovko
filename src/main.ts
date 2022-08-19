@@ -84,6 +84,9 @@ function registerSlashCommands(clientId, guildId, token) {
       .setName('морковка')
       .setDescription('Посмотреть на свою морковку'),
     new SlashCommandBuilder()
+      .setName('свидание')
+      .setDescription('Сходить с кем-то на свидание'),
+    new SlashCommandBuilder()
       .setName('топ')
       .setDescription('Узнать размер конкурсной морковки и место в рейтинге'),
     new SlashCommandBuilder()
