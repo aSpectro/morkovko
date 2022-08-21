@@ -27,14 +27,14 @@ export default {
           },
           {
             name: '!купить',
-            value: `Купить горшок за ${calcPrice(playerSlots, upgrade)} 🔸.`,
+            value: `Купить горшок за ${calcPrice(playerSlots, slot)} 🔸.`,
             inline: true,
           },
           {
             name: '!увеличить',
             value: `Увеличить конкурсную морковку за **${calcPrice(
               playerSlots,
-              slot,
+              upgrade,
             )}🔸** на 1см. **!увеличить <кол-во>**`,
             inline: true,
           },
