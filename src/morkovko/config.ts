@@ -11,6 +11,11 @@ export default {
     carrotsLimit: configService.getCarrotsLimit(),
     clientId: configService.getClientId(),
     guildId: configService.geGuildId(),
+    economy: {
+      pugalo: 1,
+      upgrade: 5,
+      slot: 3,
+    },
     dslink: `https://discord.com/oauth2/authorize?client_id=${configService.getClientId()}&scope=bot&permissions=17179878400`,
   },
 };

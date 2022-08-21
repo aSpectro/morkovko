@@ -1,5 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor } from './helpers';
+import { noUserEmbed, setEmbedAuthor, calcPrice } from './helpers';
+import config from '../config';
+const { slot } = config.bot.economy;
 
 export default {
   name: 'купить',
@@ -14,17 +16,18 @@ export default {
     service.checkUser(user.id).then((res) => {
       if (res.status === 200) {
         const player = res.player;
+        const price = calcPrice(player.slots.length, slot);
         const count = isSlash
           ? Math.abs(parseInt(args.getString('кол-во')))
           : Math.abs(parseInt(args[0]));
-        if (count && player.points >= count * 3) {
+        if (count && player.points >= count * price) {
           for (let i = 0; i < count; i++) {
             player.slots.push({
               progress: 0,
               factor: 0,
             });
           }
-          player.points -= 3 * count;
+          player.points -= price * count;
           service.savePlayer(player).then((resSave) => {
             if (resSave.status === 200) {
               embedSuccess.setDescription(
@@ -47,7 +50,7 @@ export default {
             embedError.setDescription(`Ты не указал кол-во 🧺!`);
           } else {
             embedError.setDescription(
-              `Тебе не хватает ${3 * count - player.points}🔸!`,
+              `Тебе не хватает ${price * count - player.points}🔸!`,
             );
           }
           send({

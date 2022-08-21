@@ -1,6 +1,12 @@
 import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor, randomIntFromInterval } from './helpers';
+import {
+  noUserEmbed,
+  setEmbedAuthor,
+  randomIntFromInterval,
+  calcPrice,
+} from './helpers';
 import config from '../config';
+const { upgrade } = config.bot.economy;
 
 const carrotsLimit = config.bot.carrotsLimit;
 
@@ -17,13 +23,14 @@ export default {
     service.checkUser(user.id).then((res) => {
       if (res.status === 200) {
         const player = res.player;
+        const price = calcPrice(player.slots.length, upgrade);
         const count = isSlash
           ? Math.abs(parseInt(args.getString('кол-во')))
           : Math.abs(parseInt(args[0]));
-        if (count && player.points >= count * 5) {
+        if (count && player.points >= count * price) {
           const carrotNum = randomIntFromInterval(1, carrotsLimit);
           player.carrotSize += count;
-          player.points -= count * 5;
+          player.points -= count * price;
           player.carrotAvatar = `./outputs/carrots/${carrotNum}.png`;
           service.savePlayer(player).then((resSave) => {
             if (resSave.status === 200) {
@@ -47,7 +54,7 @@ export default {
             embedError.setDescription(`Ты не указал кол-во раз!`);
           } else {
             embedError.setDescription(
-              `Тебе не хватает ${count * 5 - player.points}🔸!`,
+              `Тебе не хватает ${count * price - player.points}🔸!`,
             );
           }
           send({

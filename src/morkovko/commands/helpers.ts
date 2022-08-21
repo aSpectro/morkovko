@@ -68,3 +68,7 @@ export function calcTime(n, f, t) {
 export function randomIntFromInterval(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
+
+export function calcPrice(factor, price) {
+  return Math.round((factor / 50) * price + price);
+}

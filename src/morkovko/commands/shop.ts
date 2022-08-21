@@ -1,5 +1,8 @@
 import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor } from './helpers';
+import { noUserEmbed, setEmbedAuthor, calcPrice } from './helpers';
+import config from '../config';
+
+const { pugalo, slot, upgrade } = config.bot.economy;
 
 export default {
   name: 'магазин',
@@ -13,6 +16,7 @@ export default {
     service.checkUser(user.id).then((res) => {
       if (res.status === 200) {
         const player = res.player;
+        const playerSlots = player.slots.length;
         embedSuccess.setDescription(`Морковок: **🥕 ${player.carrotCount.toLocaleString()}**\n
         Очков улучшений: **🔸 ${player.points.toLocaleString()}**`);
         embedSuccess.addFields(
@@ -23,17 +27,23 @@ export default {
           },
           {
             name: '!купить',
-            value: `Купить горшок за 3 🔸.`,
+            value: `Купить горшок за ${calcPrice(playerSlots, upgrade)} 🔸.`,
             inline: true,
           },
           {
             name: '!увеличить',
-            value: `Увеличить конкурсную морковку за **5🔸** на 1см. **!увеличить <кол-во>**`,
+            value: `Увеличить конкурсную морковку за **${calcPrice(
+              playerSlots,
+              slot,
+            )}🔸** на 1см. **!увеличить <кол-во>**`,
             inline: true,
           },
           {
             name: '!пугало',
-            value: `Купить пугало за 1 🔸, которое отпугивает мафию, но в обед и полночь ваш сосед ворует ваше пугало`,
+            value: `Купить пугало за ${calcPrice(
+              playerSlots,
+              pugalo,
+            )} 🔸, которое отпугивает мафию, но в обед и полночь ваш сосед ворует ваше пугало`,
             inline: true,
           },
         );

@@ -23,7 +23,7 @@ export default {
           ? Math.abs(parseInt(args.getString('кол-во')))
           : Math.abs(parseInt(args[0]));
         if (count && player.carrotCount >= count) {
-          if (player.carrotCount === 1 || count === 1) grab = false;
+          if (player.carrotCount === 1) grab = false;
           player.carrotCount -= count;
           const grabCount = grab ? Math.floor(count / 2) : count;
           player.points += grab

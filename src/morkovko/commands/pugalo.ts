@@ -1,5 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor } from './helpers';
+import { noUserEmbed, setEmbedAuthor, calcPrice } from './helpers';
+import config from '../config';
+const { pugalo } = config.bot.economy;
 
 export default {
   name: 'пугало',
@@ -14,9 +16,10 @@ export default {
     service.checkUser(user.id).then((res) => {
       if (res.status === 200) {
         const player = res.player;
-        if (player.points >= 1 && !player.hasPugalo) {
+        const price = calcPrice(player.slots.length, pugalo);
+        if (player.points >= price && !player.hasPugalo) {
           player.hasPugalo = true;
-          player.points -= 1;
+          player.points -= price;
           service.savePlayer(player).then((resSave) => {
             if (resSave.status === 200) {
               embedSuccess.setDescription(
@@ -39,7 +42,7 @@ export default {
             embedError.setDescription(`У тебя уже есть пугало!`);
           } else {
             embedError.setDescription(
-              `Тебе не хватает ${1 - player.points}🔸!`,
+              `Тебе не хватает ${price - player.points}🔸!`,
             );
           }
           send({
