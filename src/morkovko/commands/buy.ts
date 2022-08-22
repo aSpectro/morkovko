@@ -1,5 +1,5 @@
 import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor, calcPrice } from './helpers';
+import { noUserEmbed, setEmbedAuthor, getCarrotLevel, getMaxSlots } from './helpers';
 import config from '../config';
 const { slot } = config.bot.economy;
 
@@ -16,11 +16,17 @@ export default {
     service.checkUser(user.id).then((res) => {
       if (res.status === 200) {
         const player = res.player;
-        const price = calcPrice(player.slots.length, slot);
+        const price = slot;
+        const maxSlots = getMaxSlots(getCarrotLevel(player.carrotSize));
+        const playerSlots = player.slots.length;
         const count = isSlash
           ? Math.abs(parseInt(args.getString('кол-во')))
           : Math.abs(parseInt(args[0]));
-        if (count && player.points >= count * price) {
+        if (
+          count &&
+          player.points >= count * price &&
+          playerSlots + count <= maxSlots
+        ) {
           for (let i = 0; i < count; i++) {
             player.slots.push({
               progress: 0,
@@ -48,6 +54,10 @@ export default {
         } else {
           if (!count) {
             embedError.setDescription(`Ты не указал кол-во 🧺!`);
+          } else if (playerSlots + count > maxSlots) {
+            embedError.setDescription(
+              `Ты не можешь купить ${count} 🧺! Увеличивай конкурсную морковку, сейчас твой лимит ${playerSlots}/${maxSlots} 🧺`,
+            );
           } else {
             embedError.setDescription(
               `Тебе не хватает ${price * count - player.points}🔸!`,

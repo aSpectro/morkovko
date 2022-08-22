@@ -24,13 +24,13 @@ export default {
         const needDiff = 1440;
 
         if (diff >= needDiff) {
+          const prayCarrots = counts[Math.floor(Math.random() * counts.length)];
           player.lastPrayDate = moment(new Date()).toDate();
-          player.carrotCount +=
-            counts[Math.floor(Math.random() * counts.length)];
+          player.carrotCount += prayCarrots;
           service.savePlayer(player).then((resSave) => {
             if (resSave.status === 200) {
               embedSuccess.setDescription(
-                `Святая подарила тебе ${player.carrotCount}🥕 за молитву!`,
+                `Святая подарила тебе ${prayCarrots}🥕 за молитву!`,
               );
               send({
                 embeds: [setEmbedAuthor(embedSuccess, user)],

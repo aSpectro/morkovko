@@ -72,3 +72,11 @@ export function randomIntFromInterval(min, max) {
 export function calcPrice(factor, price) {
   return Math.round((factor / 50) * price + price);
 }
+
+export function getCarrotLevel(carrotSize) {
+  return Math.floor(carrotSize / 3);
+}
+
+export function getMaxSlots(carrotLevel) {
+  return 10 * carrotLevel;
+}

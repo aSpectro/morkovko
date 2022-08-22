@@ -1,5 +1,5 @@
 import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor, calcPrice } from './helpers';
+import { noUserEmbed, setEmbedAuthor } from './helpers';
 import config from '../config';
 const { pugalo } = config.bot.economy;
 
@@ -16,7 +16,7 @@ export default {
     service.checkUser(user.id).then((res) => {
       if (res.status === 200) {
         const player = res.player;
-        const price = calcPrice(player.slots.length, pugalo);
+        const price = pugalo;
         if (player.points >= price && !player.hasPugalo) {
           player.hasPugalo = true;
           player.points -= price;

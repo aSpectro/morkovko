@@ -7,7 +7,6 @@ import {
 } from './helpers';
 import config from '../config';
 const { upgrade } = config.bot.economy;
-
 const carrotsLimit = config.bot.carrotsLimit;
 
 export default {
