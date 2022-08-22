@@ -55,7 +55,7 @@ export default {
             embedError.setDescription(`Ты не указал кол-во раз!`);
           } else if (count > 5) {
             embedError.setDescription(
-              `За раз, морковку можно увеличить только на 3см!`,
+              `За раз, морковку можно увеличить только на 5см!`,
             );
           } else {
             embedError.setDescription(
