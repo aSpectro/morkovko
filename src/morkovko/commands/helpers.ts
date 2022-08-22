@@ -74,7 +74,8 @@ export function calcPrice(factor, price) {
 }
 
 export function getCarrotLevel(carrotSize) {
-  return Math.floor(carrotSize / 3);
+  const level = Math.floor(carrotSize / 3);
+  return level === 0 ? 1 : level;
 }
 
 export function getMaxSlots(carrotLevel) {
