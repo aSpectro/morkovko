@@ -35,6 +35,7 @@ ADMIN_BOT_ID=id admin пользователя
 BOT_IMAGES_COUNT=кол-во сгенерированных изображений
 GUILD_DEV_ID=id discord сервера для слеш команд
 GUILD_PROD_ID=id discord сервера для слеш команд
+MORKOVKO_CHANNEL=id канала, в котором разрешено работать боту на проде
 MODE=режим разработки
 PORT=порт nest модуля
 ```

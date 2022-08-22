@@ -36,6 +36,10 @@ class ConfigService {
     return this.getValue('BOT_IMAGES_COUNT', true);
   }
 
+  public getMorkovkoChannel() {
+    return this.getValue('MORKOVKO_CHANNEL', true);
+  }
+
   public geGuildId() {
     if (this.isProduction()) {
       return this.getValue('GUILD_PROD_ID', true);

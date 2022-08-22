@@ -11,7 +11,7 @@ import { PlayerEntity } from './entities/player.entity';
 import { PlayerDTO } from './dto/player.dto';
 
 const hourProgress = config.bot.hourProgress;
-const mafiaChannelId = '1009551590476222504';
+const mafiaChannelId = configService.getMorkovkoChannel();
 
 @Injectable()
 export class AppService {

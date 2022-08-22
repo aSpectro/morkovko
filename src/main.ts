@@ -167,7 +167,12 @@ async function MorkovkoApp() {
     });
 
     client.on('interactionCreate', async (interaction) => {
-      if (!interaction.isChatInputCommand()) return;
+      if (
+        !interaction.isChatInputCommand() ||
+        (configService.isProduction() &&
+          interaction.channel.id !== configService.getMorkovkoChannel())
+      )
+        return;
       const commandController = client.commands.get(interaction.commandName);
       const args = interaction.options;
       if (commandController) {
@@ -180,13 +185,15 @@ async function MorkovkoApp() {
     });
 
     client.on('messageCreate', async (message) => {
-      // console.log(message);
+      // console.log(message.channel.id);
       const prefix = config.bot.prefix;
 
       if (
         !message.content.startsWith(prefix) ||
         message.author.bot ||
-        message.author.system
+        message.author.system ||
+        (configService.isProduction() &&
+          message.channel.id !== configService.getMorkovkoChannel())
       )
         return;
 
