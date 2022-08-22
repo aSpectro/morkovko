@@ -1,5 +1,10 @@
 import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor, getCarrotLevel, getMaxSlots } from './helpers';
+import {
+  noUserEmbed,
+  setEmbedAuthor,
+  getCarrotLevel,
+  getMaxSlots,
+} from './helpers';
 import config from '../config';
 const { slot } = config.bot.economy;
 

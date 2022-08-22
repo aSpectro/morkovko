@@ -1,5 +1,11 @@
 import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor, calcTime } from './helpers';
+import {
+  noUserEmbed,
+  setEmbedAuthor,
+  calcTime,
+  getCarrotLevel,
+  getMaxSlots,
+} from './helpers';
 import config from '../config';
 
 const hourProgress = config.bot.hourProgress;
@@ -16,6 +22,8 @@ export default {
     service.checkUser(user.id).then((res) => {
       if (res.status === 200) {
         const player = res.player;
+        const maxSlots = getMaxSlots(getCarrotLevel(player.carrotSize));
+        const playerSlots = player.slots.length;
 
         let maxProgress = player.slots[0];
         for (const slot of player.slots) {
@@ -48,7 +56,7 @@ export default {
           },
           {
             name: 'Горшков',
-            value: `🧺 ${player.slots.length.toLocaleString()}`,
+            value: `🧺 **${playerSlots}/${maxSlots}**`,
             inline: true,
           },
         );
