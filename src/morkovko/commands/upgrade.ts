@@ -4,6 +4,7 @@ import {
   setEmbedAuthor,
   randomIntFromInterval,
   calcPrice,
+  getCarrotLevel,
 } from './helpers';
 import config from '../config';
 const { upgrade } = config.bot.economy;
@@ -22,7 +23,8 @@ export default {
     service.checkUser(user.id).then((res) => {
       if (res.status === 200) {
         const player = res.player;
-        const price = calcPrice(player.slots.length, upgrade);
+        const carrotLevel = getCarrotLevel(player.carrotSize);
+        const price = calcPrice(carrotLevel, upgrade);
         const count = isSlash
           ? Math.abs(parseInt(args.getString('кол-во')))
           : Math.abs(parseInt(args[0]));
