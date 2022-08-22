@@ -26,7 +26,7 @@ export default {
         const count = isSlash
           ? Math.abs(parseInt(args.getString('кол-во')))
           : Math.abs(parseInt(args[0]));
-        if (count && player.points >= count * price) {
+        if (count && player.points >= count * price && count <= 3) {
           const carrotNum = randomIntFromInterval(1, carrotsLimit);
           player.carrotSize += count;
           player.points -= count * price;
@@ -51,6 +51,10 @@ export default {
         } else {
           if (!count) {
             embedError.setDescription(`Ты не указал кол-во раз!`);
+          } else if (count > 3) {
+            embedError.setDescription(
+              `За раз, морковку можно увеличить только на 3см!`,
+            );
           } else {
             embedError.setDescription(
               `Тебе не хватает ${count * price - player.points}🔸!`,

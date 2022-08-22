@@ -56,7 +56,7 @@ export default {
             embedError.setDescription(`Ты не указал кол-во 🧺!`);
           } else if (playerSlots + count > maxSlots) {
             embedError.setDescription(
-              `Ты не можешь купить ${count} 🧺! Увеличивай конкурсную морковку, сейчас твой лимит ${playerSlots}/${maxSlots} 🧺`,
+              `Ты не можешь купить ${count} 🧺! Увеличивай конкурсную морковку, сейчас твой лимит **${playerSlots}/${maxSlots}** 🧺`,
             );
           } else {
             embedError.setDescription(

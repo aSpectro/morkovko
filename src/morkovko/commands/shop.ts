@@ -35,7 +35,7 @@ export default {
           },
           {
             name: '!купить',
-            value: `${playerSlots}/${maxSlots} Купить горшок за ${slot} 🔸.`,
+            value: `**${playerSlots}/${maxSlots}** Купить горшок за ${slot} 🔸.`,
             inline: true,
           },
           {
