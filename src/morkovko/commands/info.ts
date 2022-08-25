@@ -82,8 +82,7 @@ export class InfoCommand extends Command {
             hourProgress,
           )}ч.**`;
 
-          const gameTime = `Игровое время: **${moment(
-            new Date(),
+          const gameTime = `Игровое время: **${moment(new Date()).format(
             'hh:mm',
           )}**\n`;
 
