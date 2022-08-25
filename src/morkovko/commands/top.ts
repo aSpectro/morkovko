@@ -1,66 +1,71 @@
-import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor } from './helpers';
+import Command from './Command';
+import { setEmbedAuthor } from './helpers';
+import { AppService } from './../../app.service';
 
-export default {
-  name: 'топ',
-  run: (message, args, service, isSlash) => {
-    const embedSuccess = new EmbedBuilder().setColor('#f97a50');
-    const embedError = new EmbedBuilder().setColor('#f97a50');
-    const user = isSlash ? message.user : message.author;
-    const send = async (a) => {
-      if (isSlash) await message.reply(a).catch(() => console.log(''));
-      else message.channel.send(a).catch(() => console.log(''));
-    };
-    service.checkUser(user.id).then((res) => {
-      if (res.status === 200) {
-        const player = res.player;
+export class TopCommand extends Command {
+  constructor(commandName: string) {
+    super(commandName);
+  }
 
-        service.getUsersTop().then(async (resTop) => {
-          if (resTop.status === 200) {
-            const userRate = resTop.data.findIndex(
-              (f) => f.userId === player.userId,
-            );
-            embedSuccess.setDescription(
-              `Твое место в рейтинге **${
-                userRate + 1
-              }**! Размер морковки **${player.carrotSize.toLocaleString()}** см`,
-            );
+  run(
+    message: any,
+    args: any,
+    service: AppService,
+    isSlash: boolean | undefined,
+  ) {
+    this.initCommand(message, args, service, isSlash, () => {
+      const user = this.getUser();
+      service.checkUser(user.id).then((res) => {
+        if (res.status === 200) {
+          const player = res.player;
 
-            const data = resTop.data.slice(0, 4);
-            const reqs = [];
+          service.getUsersTop().then(async (resTop) => {
+            if (resTop.status === 200) {
+              const userRate = resTop.data.findIndex(
+                (f) => f.userId === player.userId,
+              );
+              this.embed.setDescription(
+                `Твое место в рейтинге **${
+                  userRate + 1
+                }**! Размер морковки **${player.carrotSize.toLocaleString()}** см`,
+              );
 
-            for (let i = 0; i < data.length; i++) {
-              const u = resTop.data[i];
-              const req = await service.getUsername(u.userId);
-              reqs.push(req);
-            }
-            Promise.all([...reqs]).then((resData) => {
-              for (let i = 0; i < resData.length; i++) {
-                const field = {
-                  nickname: resData[i].username,
-                  size: resTop.data[i].carrotSize,
-                };
-                embedSuccess.addFields({
-                  name: `${i + 1}. ${field.nickname}`,
-                  value: `Размер морковки **${field.size.toLocaleString()}** см`,
-                });
+              const data = resTop.data.slice(0, 4);
+              const reqs = [];
+
+              for (let i = 0; i < data.length; i++) {
+                const u = resTop.data[i];
+                const req = await service.getUsername(u.userId);
+                reqs.push(req);
               }
-              send({
-                embeds: [setEmbedAuthor(embedSuccess, user)],
+              Promise.all([...reqs]).then((resData) => {
+                for (let i = 0; i < resData.length; i++) {
+                  const field = {
+                    nickname: resData[i].username,
+                    size: resTop.data[i].carrotSize,
+                  };
+                  this.embed.addFields({
+                    name: `${i + 1}. ${field.nickname}`,
+                    value: `Размер морковки **${field.size.toLocaleString()}** см`,
+                  });
+                }
+                this.send({
+                  embeds: [setEmbedAuthor(this.embed, user)],
+                });
               });
-            });
-          } else {
-            embedError.setDescription(
-              `Не получилось получить рейтинг. Попробуй позже.`,
-            );
-            send({
-              embeds: [setEmbedAuthor(embedError, user)],
-            });
-          }
-        });
-      } else {
-        send({ embeds: [noUserEmbed(user)] });
-      }
+            } else {
+              this.embed.setDescription(
+                `Не получилось получить рейтинг. Попробуй позже.`,
+              );
+              this.send({
+                embeds: [setEmbedAuthor(this.embed, user)],
+              });
+            }
+          });
+        } else {
+          this.replyNoUser(user);
+        }
+      });
     });
-  },
-};
+  }
+}

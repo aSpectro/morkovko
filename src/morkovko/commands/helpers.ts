@@ -81,3 +81,7 @@ export function getCarrotLevel(carrotSize) {
 export function getMaxSlots(carrotLevel) {
   return 5 * carrotLevel;
 }
+
+export function getChance() {
+  return Math.random() * 100;
+}

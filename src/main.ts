@@ -170,7 +170,8 @@ async function MorkovkoApp() {
       if (
         !interaction.isChatInputCommand() ||
         (configService.isProduction() &&
-          interaction.channel.id !== configService.getMorkovkoChannel())
+          interaction.channel.id !== configService.getMorkovkoChannel()) ||
+        !configService.isProduction()
       )
         return;
       const commandController = client.commands.get(interaction.commandName);

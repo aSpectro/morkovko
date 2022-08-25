@@ -1,74 +1,68 @@
-import { EmbedBuilder } from 'discord.js';
-import {
-  noUserEmbed,
-  setEmbedAuthor,
-  randomIntFromInterval,
-  calcPrice,
-  getCarrotLevel,
-} from './helpers';
-import config from '../config';
-const { upgrade } = config.bot.economy;
-const carrotsLimit = config.bot.carrotsLimit;
+import Command from './Command';
+import { setEmbedAuthor, calcPrice, getCarrotLevel } from './helpers';
+import { AppService } from './../../app.service';
 
-export default {
-  name: 'увеличить',
-  run: (message, args, service, isSlash) => {
-    const embedSuccess = new EmbedBuilder().setColor('#f97a50');
-    const embedError = new EmbedBuilder().setColor('#f97a50');
-    const user = isSlash ? message.user : message.author;
-    const send = async (a) => {
-      if (isSlash) await message.reply(a).catch(() => console.log(''));
-      else message.channel.send(a).catch(() => console.log(''));
-    };
-    service.checkUser(user.id).then((res) => {
-      if (res.status === 200) {
-        const player = res.player;
-        const carrotLevel = getCarrotLevel(player.carrotSize);
-        const price = calcPrice(carrotLevel, upgrade);
-        const count = isSlash
-          ? Math.abs(parseInt(args.getString('кол-во')))
-          : Math.abs(parseInt(args[0]));
-        if (count && player.points >= count * price && count <= 5) {
-          const carrotNum = randomIntFromInterval(1, carrotsLimit);
-          player.carrotSize += count;
-          player.points -= count * price;
-          player.carrotAvatar = `./outputs/carrots/${carrotNum}.png`;
-          service.savePlayer(player).then((resSave) => {
-            if (resSave.status === 200) {
-              embedSuccess.setDescription(
-                `Ты увеличил конкурсную морковку. Теперь ее размер **${player.carrotSize}** см! Возможно она мутировала.`,
-              );
-              send({
-                embeds: [setEmbedAuthor(embedSuccess, user)],
-              });
-            } else {
-              embedError.setDescription(
-                `Не получилось увеличить конкурсную морковку. Попробуй позже.`,
-              );
-              send({
-                embeds: [setEmbedAuthor(embedError, user)],
-              });
-            }
-          });
-        } else {
-          if (!count) {
-            embedError.setDescription(`Ты не указал кол-во раз!`);
-          } else if (count > 5) {
-            embedError.setDescription(
-              `За раз, морковку можно увеличить только на 5см!`,
-            );
+export class UpgradeCommand extends Command {
+  constructor(commandName: string) {
+    super(commandName);
+  }
+
+  run(
+    message: any,
+    args: any,
+    service: AppService,
+    isSlash: boolean | undefined,
+  ) {
+    this.initCommand(message, args, service, isSlash, () => {
+      const user = this.getUser();
+      const { upgrade } = this.config.bot.economy;
+      service.checkUser(user.id).then((res) => {
+        if (res.status === 200) {
+          const player = res.player;
+          const carrotLevel = getCarrotLevel(player.carrotSize);
+          const price = calcPrice(carrotLevel, upgrade);
+          const count = this.getArgString('кол-во');
+          if (count && player.points >= count * price && count <= 5) {
+            player.carrotSize += count;
+            player.points -= count * price;
+            player.carrotAvatar = this.getRandomAvatar();
+            service.savePlayer(player).then((resSave) => {
+              if (resSave.status === 200) {
+                this.embed.setDescription(
+                  `Ты увеличил конкурсную морковку. Теперь ее размер **${player.carrotSize}** см! Возможно она мутировала.`,
+                );
+                this.send({
+                  embeds: [setEmbedAuthor(this.embed, user)],
+                });
+              } else {
+                this.embed.setDescription(
+                  `Не получилось увеличить конкурсную морковку. Попробуй позже.`,
+                );
+                this.send({
+                  embeds: [setEmbedAuthor(this.embed, user)],
+                });
+              }
+            });
           } else {
-            embedError.setDescription(
-              `Тебе не хватает ${count * price - player.points}🔸!`,
-            );
+            if (!count) {
+              this.embed.setDescription(`Ты не указал кол-во раз!`);
+            } else if (count > 5) {
+              this.embed.setDescription(
+                `За раз, морковку можно увеличить только на 5см!`,
+              );
+            } else {
+              this.embed.setDescription(
+                `Тебе не хватает ${count * price - player.points}🔸!`,
+              );
+            }
+            this.send({
+              embeds: [setEmbedAuthor(this.embed, user)],
+            });
           }
-          send({
-            embeds: [setEmbedAuthor(embedError, user)],
-          });
+        } else {
+          this.replyNoUser(user);
         }
-      } else {
-        send({ embeds: [noUserEmbed(user)] });
-      }
+      });
     });
-  },
-};
+  }
+}

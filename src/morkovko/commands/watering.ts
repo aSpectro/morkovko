@@ -1,56 +1,58 @@
-import { EmbedBuilder } from 'discord.js';
+import Command from './Command';
 import * as moment from 'moment';
-import { noUserEmbed, setEmbedAuthor, getTimeFromMins } from './helpers';
+import { setEmbedAuthor, getTimeFromMins } from './helpers';
+import { AppService } from './../../app.service';
 
-export default {
-  name: 'полить',
-  run: (message, args, service, isSlash) => {
-    const embedSuccess = new EmbedBuilder()
-      .setColor('#f97a50')
-      .setDescription(`Морковка полита!`);
+export class WateringCommand extends Command {
+  constructor(commandName: string) {
+    super(commandName);
+  }
 
-    const embedError = new EmbedBuilder()
-      .setColor('#f97a50')
-      .setDescription(`Не получилось полить морковку, попробуй позже!`);
+  run(
+    message: any,
+    args: any,
+    service: AppService,
+    isSlash: boolean | undefined,
+  ) {
+    this.initCommand(message, args, service, isSlash, () => {
+      const user = this.getUser();
+      service.checkUser(user.id).then((res) => {
+        if (res.status === 200) {
+          const d1 = moment(res.player.lastWateringDate);
+          const d2 = moment(new Date());
+          const diff = d2.diff(d1, 'minutes');
+          const needDiff = 60;
 
-    const embedErrorTime = new EmbedBuilder().setColor('#f97a50');
-    const user = isSlash ? message.user : message.author;
-    const send = async (a) => {
-      if (isSlash) await message.reply(a).catch(() => console.log(''));
-      else message.channel.send(a).catch(() => console.log(''));
-    };
-    service.checkUser(user.id).then((res) => {
-      if (res.status === 200) {
-        const d1 = moment(res.player.lastWateringDate);
-        const d2 = moment(new Date());
-        const diff = d2.diff(d1, 'minutes');
-        const needDiff = 60;
-
-        if (diff >= needDiff) {
-          service.watering(res.player).then((resWatering) => {
-            if (resWatering.status === 200) {
-              send({
-                embeds: [setEmbedAuthor(embedSuccess, user)],
-              });
-            } else {
-              send({
-                embeds: [setEmbedAuthor(embedError, user)],
-              });
-            }
-          });
+          if (diff >= needDiff) {
+            service.watering(res.player).then((resWatering) => {
+              if (resWatering.status === 200) {
+                this.embed.setDescription(`Морковка полита!`);
+                this.send({
+                  embeds: [setEmbedAuthor(this.embed, user)],
+                });
+              } else {
+                this.embed.setDescription(
+                  `Не получилось полить морковку, попробуй позже!`,
+                );
+                this.send({
+                  embeds: [setEmbedAuthor(this.embed, user)],
+                });
+              }
+            });
+          } else {
+            this.embed.setDescription(
+              `Ты сможешь полить морковку не раньше чем через ${getTimeFromMins(
+                needDiff - diff,
+              )}!`,
+            );
+            this.send({
+              embeds: [setEmbedAuthor(this.embed, user)],
+            });
+          }
         } else {
-          embedErrorTime.setDescription(
-            `Ты сможешь полить морковку не раньше чем через ${getTimeFromMins(
-              needDiff - diff,
-            )}!`,
-          );
-          send({
-            embeds: [setEmbedAuthor(embedErrorTime, user)],
-          });
+          this.replyNoUser(user);
         }
-      } else {
-        send({ embeds: [noUserEmbed(user)] });
-      }
+      });
     });
-  },
-};
+  }
+}

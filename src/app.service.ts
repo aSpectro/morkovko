@@ -52,6 +52,7 @@ export class AppService {
 
   @Cron('0 0 */12 * * *')
   async gameMafia() {
+    if (!configService.isProduction()) return;
     try {
       const data: PlayerDTO[] = await this.playerRepository.find({
         where: {

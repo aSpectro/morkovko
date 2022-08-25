@@ -11,15 +11,15 @@ export interface Relation {
 export interface PlayerDTO {
   id?: string;
   userId: string;
-  carrotCount: number;
-  points: number;
-  carrotSize: number;
+  carrotCount?: number;
+  points?: number;
+  carrotSize?: number;
   carrotAvatar?: string;
   lastWateringDate?: Date;
   lastPrayDate?: Date;
   lastADate?: Date;
   creationDate?: Date;
   slots: Slot[];
-  hasPugalo: boolean;
-  relations: Relation[];
+  hasPugalo?: boolean;
+  relations?: Relation[];
 }
