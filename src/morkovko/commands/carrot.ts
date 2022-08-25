@@ -1,40 +1,49 @@
-import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
+import Command from './Command';
+import { AttachmentBuilder } from 'discord.js';
 import { createCanvas, loadImage } from 'canvas';
-import { noUserEmbed, setEmbedAuthor } from './helpers';
+import { setEmbedAuthor } from './helpers';
+import { AppService } from './../../app.service';
 
-export default {
-  name: 'морковка',
-  run: (message, args, service, isSlash) => {
-    const embedSuccess = new EmbedBuilder().setColor('#f97a50');
-    const embedError = new EmbedBuilder().setColor('#f97a50');
-    const user = isSlash ? message.user : message.author;
-    const send = async (a) => {
-      if (isSlash) await message.reply(a).catch(() => console.log(''));
-      else message.channel.send(a).catch(() => console.log(''));
-    };
-    service.checkUser(user.id).then(async (res) => {
-      if (res.status === 200) {
-        const player = res.player;
-        const canvas = createCanvas(256, 256);
-        const ctx = canvas.getContext('2d');
-        const carrot = await loadImage(player.carrotAvatar);
-        ctx.drawImage(carrot, 0, 0, 256, 256);
-        const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), {
-          name: 'carrot.png',
-        });
+export class CarrotCommand extends Command {
+  constructor(commandName: string) {
+    super(commandName);
+  }
 
-        if (carrot) {
-          embedSuccess.setDescription(
-            `Размер морковки **${player.carrotSize.toLocaleString()}** см`,
+  run(
+    message: any,
+    args: any,
+    service: AppService,
+    isSlash: boolean | undefined,
+  ) {
+    this.initCommand(message, args, service, isSlash, () => {
+      const user = this.getUser();
+      service.checkUser(user.id).then(async (res) => {
+        if (res.status === 200) {
+          const player = res.player;
+          const canvas = createCanvas(256, 256);
+          const ctx = canvas.getContext('2d');
+          const carrot = await loadImage(player.carrotAvatar);
+          ctx.drawImage(carrot, 0, 0, 256, 256);
+          const attachment = new AttachmentBuilder(
+            canvas.toBuffer('image/png'),
+            {
+              name: 'carrot.png',
+            },
           );
-          send({
-            embeds: [setEmbedAuthor(embedSuccess, user)],
-            files: [attachment],
-          });
+
+          if (carrot) {
+            this.embed.setDescription(
+              `Размер морковки **${player.carrotSize.toLocaleString()}** см`,
+            );
+            this.send({
+              embeds: [setEmbedAuthor(this.embed, user)],
+              files: [attachment],
+            });
+          }
+        } else {
+          this.replyNoUser(user);
         }
-      } else {
-        send({ embeds: [noUserEmbed(user)] });
-      }
+      });
     });
-  },
-};
+  }
+}

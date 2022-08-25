@@ -1,47 +1,48 @@
-import Ping from './ping';
-import Help from './help';
-import Start from './start';
-import Watering from './watering';
-import Inventory from './inventory';
-import Shop from './shop';
-import Sell from './sell';
-import Upgrade from './upgrade';
-import Gift from './gift';
-import Pray from './pray';
-import Carrot from './carrot';
-import Exit from './exit';
-import Buy from './buy';
-import Top from './top';
-import Info from './info';
-import Adate from './adate';
-import Friend from './friend';
-import Pugalo from './pugalo';
-import NC from './admin/nc'; // обнулить морковки
-import NP from './admin/np'; // обнулить очки
-import GC from './admin/gc'; // выдать морковки игроку
-import GP from './admin/gp'; // выдать очки игроку
+import { PingCommand } from './ping';
+import { HelpCommand } from './help';
+import { StartCommand } from './start';
+import { WateringCommand } from './watering';
+import { InventoryCommand } from './inventory';
+import { ShopCommand } from './shop';
+import { SellCommand } from './sell';
+import { UpgradeCommand } from './upgrade';
+import { GiftCommand } from './gift';
+import { PrayCommand } from './pray';
+import { CarrotCommand } from './carrot';
+import { ExitCommand } from './exit';
+import { BuyCommand } from './buy';
+import { TopCommand } from './top';
+import { InfoCommand } from './info';
+import { AdateCommand } from './adate';
+import { FriendCommand } from './friend';
+import { PugaloCommand } from './pugalo';
+import { NCCommand } from './admin/nc'; // обнулить морковки
+import { NPCommand } from './admin/np'; // обнулить очки
+import { GCCommand } from './admin/gc'; // выдать морковки игроку
+import { GPCommand } from './admin/gp'; // выдать очки игроку
 
 export default [
-  Ping,
-  Help,
-  Start,
-  Watering,
-  Inventory,
-  Shop,
-  Sell,
-  Upgrade,
-  Gift,
-  Pray,
-  Carrot,
-  Exit,
-  Buy,
-  Top,
-  Info,
-  Adate,
-  Friend,
-  Pugalo,
-  NC,
-  GC,
-  GP,
-  NP,
+  new StartCommand('начать'),
+  new PingCommand('ping'),
+  new HelpCommand('помощь'),
+  new WateringCommand('полить'),
+  new InventoryCommand('инвентарь'),
+  new ShopCommand('магазин'),
+  new SellCommand('продать'),
+  new UpgradeCommand('увеличить'),
+  new GiftCommand('подарить'),
+  new PrayCommand('помолиться'),
+  new CarrotCommand('морковка'),
+  new ExitCommand('выкти'),
+  new BuyCommand('купить'),
+  new TopCommand('топ'),
+  new InfoCommand('инфо'),
+  new AdateCommand('свидание'),
+  new FriendCommand('игрок'),
+  new PugaloCommand('пугало'),
+  // admin commands
+  new NCCommand('nc'),
+  new NPCommand('np'),
+  new GCCommand('gc'),
+  new GPCommand('gp'),
 ];

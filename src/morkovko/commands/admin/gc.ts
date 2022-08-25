@@ -1,19 +1,24 @@
-import { EmbedBuilder } from 'discord.js';
-import { setEmbedAuthor, randomIntFromInterval } from './../helpers';
-import config from '../../config';
+import Command from './../Command';
+import { AppService } from './../../../app.service';
 
-export default {
-  name: 'gc',
-  run: (message, args, service, isSlash) => {
-    const user = isSlash ? message.user : message.author;
-    const userMention = isSlash
-      ? args.getUser('игрок')
-      : message.mentions.users.first();
-    const count = isSlash
-      ? parseInt(args.getString('кол-во'))
-      : parseInt(args[0]);
-    if (user.id === config.admin) {
-      service.giveCarrots(userMention.id, count);
-    }
-  },
-};
+export class GCCommand extends Command {
+  constructor(commandName: string) {
+    super(commandName);
+  }
+
+  run(
+    message: any,
+    args: any,
+    service: AppService,
+    isSlash: boolean | undefined,
+  ) {
+    this.initCommand(message, args, service, isSlash, () => {
+      const user = this.getUser();
+      const userMention = this.getArgUser('игрок');
+      const count = this.getArgString('кол-во');
+      if (user.id === this.config.admin) {
+        service.giveCarrots(userMention.id, count);
+      }
+    });
+  }
+}

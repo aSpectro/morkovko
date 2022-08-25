@@ -1,76 +1,78 @@
-import { EmbedBuilder } from 'discord.js';
-import { noUserEmbed, setEmbedAuthor } from './helpers';
+import Command from './Command';
+import { setEmbedAuthor, getChance } from './helpers';
+import { AppService } from './../../app.service';
 
-export default {
-  name: 'продать',
-  run: (message, args, service, isSlash) => {
-    const embedSuccess = new EmbedBuilder().setColor('#f97a50');
-    const embedError = new EmbedBuilder().setColor('#f97a50');
-    const user = isSlash ? message.user : message.author;
-    const send = async (a) => {
-      if (isSlash) await message.reply(a).catch(() => console.log(''));
-      else message.channel.send(a).catch(() => console.log(''));
-    };
+export class SellCommand extends Command {
+  constructor(commandName: string) {
+    super(commandName);
+  }
 
-    const grabChance = Math.random() * 100;
-    let grab = false;
-    if (grabChance <= 5) grab = true;
+  run(
+    message: any,
+    args: any,
+    service: AppService,
+    isSlash: boolean | undefined,
+  ) {
+    this.initCommand(message, args, service, isSlash, () => {
+      const user = this.getUser();
+      const grabChance = getChance();
+      let grab = false;
+      if (grabChance <= 5) grab = true;
 
-    service.checkUser(user.id).then((res) => {
-      if (res.status === 200) {
-        const player = res.player;
-        const count = isSlash
-          ? Math.abs(parseInt(args.getString('кол-во')))
-          : Math.abs(parseInt(args[0]));
-        if (count && player.carrotCount >= count) {
-          if (player.carrotCount === 1) grab = false;
-          player.carrotCount -= count;
-          const grabCount = grab ? Math.floor(count / 2) : count;
-          player.points += grab
-            ? count - (grabCount === 0 ? 1 : grabCount)
-            : count;
-          service.savePlayer(player).then((resSave) => {
-            if (resSave.status === 200) {
-              if (grab) {
-                embedSuccess.setDescription(
-                  `Во время продажи тебя кто-то увидел и позвонил в налоговую, у тебя изъяли ${
-                    grabCount === 0 ? 1 : grabCount
-                  }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${
-                    count - grabCount
-                  }🥕. Теперь у тебя на счету ${player.points}🔸`,
-                );
+      service.checkUser(user.id).then((res) => {
+        if (res.status === 200) {
+          const player = res.player;
+          const count = this.getArgString('кол-во');
+          if (count && player.carrotCount >= count) {
+            if (player.carrotCount === 1) grab = false;
+            player.carrotCount -= count;
+            const grabCount = grab ? Math.floor(count / 2) : count;
+            player.points += grab
+              ? count - (grabCount === 0 ? 1 : grabCount)
+              : count;
+            service.savePlayer(player).then((resSave) => {
+              if (resSave.status === 200) {
+                if (grab) {
+                  this.embed.setDescription(
+                    `Во время продажи тебя кто-то увидел и позвонил в налоговую, у тебя изъяли ${
+                      grabCount === 0 ? 1 : grabCount
+                    }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${
+                      count - grabCount
+                    }🥕. Теперь у тебя на счету ${player.points}🔸`,
+                  );
+                } else {
+                  this.embed.setDescription(
+                    `Ты продал ${count}🥕. Теперь у тебя на счету ${player.points}🔸`,
+                  );
+                }
+                this.send({
+                  embeds: [setEmbedAuthor(this.embed, user)],
+                });
               } else {
-                embedSuccess.setDescription(
-                  `Ты продал ${count}🥕. Теперь у тебя на счету ${player.points}🔸`,
+                this.embed.setDescription(
+                  `Не получилось продать 🥕. Попробуй позже.`,
                 );
+                this.send({
+                  embeds: [setEmbedAuthor(this.embed, user)],
+                });
               }
-              send({
-                embeds: [setEmbedAuthor(embedSuccess, user)],
-              });
-            } else {
-              embedError.setDescription(
-                `Не получилось продать 🥕. Попробуй позже.`,
-              );
-              send({
-                embeds: [setEmbedAuthor(embedError, user)],
-              });
-            }
-          });
-        } else {
-          if (!count) {
-            embedError.setDescription(`Ты не указал кол-во 🥕!`);
+            });
           } else {
-            embedError.setDescription(
-              `Тебе не хватает ${count - player.carrotCount}🥕!`,
-            );
+            if (!count) {
+              this.embed.setDescription(`Ты не указал кол-во 🥕!`);
+            } else {
+              this.embed.setDescription(
+                `Тебе не хватает ${count - player.carrotCount}🥕!`,
+              );
+            }
+            this.send({
+              embeds: [setEmbedAuthor(this.embed, user)],
+            });
           }
-          send({
-            embeds: [setEmbedAuthor(embedError, user)],
-          });
+        } else {
+          this.replyNoUser(user);
         }
-      } else {
-        send({ embeds: [noUserEmbed(user)] });
-      }
+      });
     });
-  },
-};
+  }
+}

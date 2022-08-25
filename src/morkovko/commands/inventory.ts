@@ -1,69 +1,71 @@
-import { EmbedBuilder } from 'discord.js';
+import Command from './Command';
 import {
-  noUserEmbed,
   setEmbedAuthor,
   calcTime,
   getCarrotLevel,
   getMaxSlots,
 } from './helpers';
-import config from '../config';
+import { AppService } from './../../app.service';
 
-const hourProgress = config.bot.hourProgress;
+export class InventoryCommand extends Command {
+  constructor(commandName: string) {
+    super(commandName);
+  }
 
-export default {
-  name: 'инвентарь',
-  run: (message, args, service, isSlash) => {
-    const embedSuccess = new EmbedBuilder().setColor('#f97a50');
-    const user = isSlash ? message.user : message.author;
-    const send = async (a) => {
-      if (isSlash) await message.reply(a).catch(() => console.log(''));
-      else message.channel.send(a).catch(() => console.log(''));
-    };
-    service.checkUser(user.id).then((res) => {
-      if (res.status === 200) {
-        const player = res.player;
-        const maxSlots = getMaxSlots(getCarrotLevel(player.carrotSize));
-        const playerSlots = player.slots.length;
+  run(
+    message: any,
+    args: any,
+    service: AppService,
+    isSlash: boolean | undefined,
+  ) {
+    this.initCommand(message, args, service, isSlash, () => {
+      const user = this.getUser();
+      service.checkUser(user.id).then((res) => {
+        if (res.status === 200) {
+          const player = res.player;
+          const maxSlots = getMaxSlots(getCarrotLevel(player.carrotSize));
+          const playerSlots = player.slots.length;
 
-        let maxProgress = player.slots[0];
-        for (const slot of player.slots) {
-          if (slot.progress > maxProgress.progress) {
-            maxProgress = slot;
-          } else if (
-            slot.progress === maxProgress.progress &&
-            slot.factor > maxProgress.factor
-          ) {
-            maxProgress = slot;
+          let maxProgress = player.slots[0];
+          for (const slot of player.slots) {
+            if (slot.progress > maxProgress.progress) {
+              maxProgress = slot;
+            } else if (
+              slot.progress === maxProgress.progress &&
+              slot.factor > maxProgress.factor
+            ) {
+              maxProgress = slot;
+            }
           }
+          const p = Math.round(maxProgress.progress);
+          this.embed.setDescription(`Твой инвентарь\n
+          Ближайшая к созреванию морковка: **${p}%**. Осталось примерно **${calcTime(
+            maxProgress.progress,
+            maxProgress.factor,
+            this.config.bot.hourProgress,
+          )}ч.**\nПугало: ${player.hasPugalo ? '**есть**' : '**нет**'}`);
+          this.embed.addFields(
+            {
+              name: 'Морковок',
+              value: `🥕 ${player.carrotCount.toLocaleString()}`,
+              inline: true,
+            },
+            {
+              name: 'Очков улучшений',
+              value: `🔸 ${player.points.toLocaleString()}`,
+              inline: true,
+            },
+            {
+              name: 'Горшков',
+              value: `🧺 **${playerSlots}/${maxSlots}**`,
+              inline: true,
+            },
+          );
+          this.send({ embeds: [setEmbedAuthor(this.embed, user)] });
+        } else {
+          this.replyNoUser(user);
         }
-        const p = Math.round(maxProgress.progress);
-        embedSuccess.setDescription(`Твой инвентарь\n
-        Ближайшая к созреванию морковка: **${p}%**. Осталось примерно **${calcTime(
-          maxProgress.progress,
-          maxProgress.factor,
-          hourProgress,
-        )}ч.**\nПугало: ${player.hasPugalo ? '**есть**' : '**нет**'}`);
-        embedSuccess.addFields(
-          {
-            name: 'Морковок',
-            value: `🥕 ${player.carrotCount.toLocaleString()}`,
-            inline: true,
-          },
-          {
-            name: 'Очков улучшений',
-            value: `🔸 ${player.points.toLocaleString()}`,
-            inline: true,
-          },
-          {
-            name: 'Горшков',
-            value: `🧺 **${playerSlots}/${maxSlots}**`,
-            inline: true,
-          },
-        );
-        send({ embeds: [setEmbedAuthor(embedSuccess, user)] });
-      } else {
-        send({ embeds: [noUserEmbed(user)] });
-      }
+      });
     });
-  },
-};
+  }
+}
