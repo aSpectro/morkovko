@@ -83,7 +83,7 @@ export class InfoCommand extends Command {
           )}ч.**`;
 
           const gameTime = `Игровое время: **${moment(new Date()).format(
-            'hh:mm',
+            'HH:mm',
           )}**\n`;
 
           this.embed.setDescription(

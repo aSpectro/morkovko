@@ -1,3 +1,4 @@
+import { performance } from 'node:perf_hooks';
 import { Injectable } from '@nestjs/common';
 import { configService } from './config/config.service';
 import { Cron } from '@nestjs/schedule';
@@ -23,10 +24,13 @@ export class AppService {
 
   @Cron('0 0 * * * *')
   async gameTick() {
+    const tStart = performance.now();
     try {
       const data: PlayerDTO[] = await this.playerRepository.find();
+      let slotsCount = 0;
       for (const player of data) {
         const slots = player.slots;
+        slotsCount += slots.length;
 
         for (const slot of slots) {
           const factor = slot.factor === 0 ? 1 : slot.factor;
@@ -45,6 +49,10 @@ export class AppService {
 
         this.savePlayer(player);
       }
+      const tEnd = performance.now();
+      console.log('gameTick performance: ' + (tEnd - tStart) + ' milliseconds');
+      console.log(`Всего горшков: ${slotsCount}`);
+      console.log(`Всего игроков: ${data.length}`);
     } catch (error) {
       console.log(error);
     }
