@@ -20,7 +20,7 @@ export class UpgradeCommand extends Command {
         if (res.status === 200) {
           const player = res.player;
           const carrotLevel = getCarrotLevel(player.carrotSize);
-          const price = calcPrice(carrotLevel, upgrade);
+          const price = calcPrice(player.slots.length, upgrade);
           const count = this.getArgString('кол-во');
           if (count && player.points >= count * price && count <= 5) {
             player.carrotSize += count;
