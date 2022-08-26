@@ -44,7 +44,7 @@ export class ShopCommand extends Command {
             {
               name: '!увеличить',
               value: `Увеличить конкурсную морковку за **${calcPrice(
-                carrotLevel,
+                player.slots.length,
                 upgrade,
               )}🔸** на 1см. **!увеличить <кол-во>**`,
               inline: true,
