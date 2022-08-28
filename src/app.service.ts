@@ -122,6 +122,21 @@ export class AppService {
     }
   }
 
+  @Cron('0 0 1 * * *')
+  async resetGifts() {
+    try {
+      await this.playerRepository
+        .createQueryBuilder()
+        .update()
+        .set({
+          dailyGiftCount: 3,
+        })
+        .execute();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   setClient(client: any) {
     this.client = client;
   }

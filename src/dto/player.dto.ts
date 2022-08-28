@@ -34,22 +34,14 @@ export interface PlayerDTO {
   relations: Relation[];
   progressBonus: number;
   config: Config;
+  dailyGiftCount: number;
 }
 
 export interface PlayerReqDTO {
-  id?: string;
   userId: string;
-  carrotCount?: number;
-  points?: number;
-  carrotSize?: number;
   carrotAvatar?: string;
   lastWateringDate?: Date;
   lastPrayDate?: Date;
   lastADate?: Date;
-  creationDate?: Date;
   slots: Slot[];
-  hasPugalo?: boolean;
-  relations?: Relation[];
-  progressBonus?: number;
-  config?: Config;
 }

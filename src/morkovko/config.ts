@@ -12,6 +12,7 @@ export default {
     clientId: configService.getClientId(),
     guildId: configService.geGuildId(),
     economy: {
+      maxGiftCount: 10,
       pugalo: 1,
       upgrade: 5,
       slot: 3,

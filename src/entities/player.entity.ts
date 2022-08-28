@@ -37,6 +37,9 @@ export class PlayerEntity {
   @Column({ type: 'int4', nullable: false, default: 1 })
   progressBonus: number;
 
+  @Column({ type: 'int4', nullable: false, default: 3 })
+  dailyGiftCount: number;
+
   @Column({ type: 'boolean', nullable: false, default: false })
   hasPugalo: boolean;
 

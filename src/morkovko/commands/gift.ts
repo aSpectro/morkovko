@@ -2,8 +2,6 @@ import Command from './Command';
 import { setEmbedAuthor, getRelLevelName } from './helpers';
 import { AppService } from './../../app.service';
 
-const levelsCount = [1, 2, 3];
-
 export class GiftCommand extends Command {
   constructor(commandName: string) {
     super(commandName);
@@ -20,13 +18,16 @@ export class GiftCommand extends Command {
       const userMention = this.getArgUser('игрок');
       service.checkUser(user.id).then((res) => {
         if (res.status === 200) {
+          const { maxGiftCount } = this.config.bot.economy;
           const player = res.player;
           const count = this.getArgString('кол-во');
           if (
             userMention &&
             count &&
             userMention.id !== user.id &&
-            player.carrotCount >= count
+            player.carrotCount >= count &&
+            count <= maxGiftCount &&
+            player.dailyGiftCount > 0
           ) {
             service.checkUser(userMention.id).then((resMention) => {
               if (resMention.status === 200) {
@@ -35,8 +36,7 @@ export class GiftCommand extends Command {
                 playerMention.carrotCount += count;
 
                 let level = 0;
-                const levelBoost =
-                  levelsCount[Math.floor(Math.random() * levelsCount.length)];
+                const levelBoost = Math.round((count / 100) * 2 + 1);
 
                 if (player.relations) {
                   const relUser = player.relations.find(
@@ -85,6 +85,8 @@ export class GiftCommand extends Command {
                 level = player.relations.find(
                   (f) => f.userId === playerMention.userId,
                 ).level;
+
+                player.dailyGiftCount -= 1;
 
                 service.savePlayer(player).then((resSave) => {
                   if (resSave.status === 200) {
@@ -140,6 +142,18 @@ export class GiftCommand extends Command {
               });
             } else if (userMention.id === user.id || userMention.bot) {
               this.embed.setDescription('Нельзя подарить себе 🥕!');
+              this.send({
+                embeds: [setEmbedAuthor(this.embed, user)],
+              });
+            } else if (count > maxGiftCount) {
+              this.embed.setDescription('Нельзя подарить больше 10 🥕 за раз!');
+              this.send({
+                embeds: [setEmbedAuthor(this.embed, user)],
+              });
+            } else if (player.dailyGiftCount === 0) {
+              this.embed.setDescription(
+                'Твой лимит подарков на сегодня исчерпан!',
+              );
               this.send({
                 embeds: [setEmbedAuthor(this.embed, user)],
               });

@@ -51,7 +51,7 @@ export class InventoryCommand extends Command {
             player.hasPugalo ? '**есть**' : '**нет**'
           }\nАвтопокупка пугала: ${
             player.config.autoBuyPugalo ? '**активна**' : '**нет**'
-          }`);
+          }\nДневной лимит подарков: **${player.dailyGiftCount}/3**`);
           this.embed.addFields(
             {
               name: 'Морковок',
