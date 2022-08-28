@@ -85,6 +85,15 @@ export default abstract class Command {
         factor: 0,
       },
     ];
+    player.config = {
+      autoBuyPugalo: false,
+      slotSpeedUpdate: 0,
+      cooldowns: {
+        adate: 0,
+        watering: 0,
+        pray: 0,
+      },
+    }
     return player;
   }
 }
