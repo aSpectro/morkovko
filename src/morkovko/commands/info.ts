@@ -1,6 +1,11 @@
 import Command from './Command';
 import * as moment from 'moment';
-import { setEmbedAuthor, getTimeFromMins, calcTime } from './helpers';
+import {
+  setEmbedAuthor,
+  getTimeFromMins,
+  calcTime,
+  calcNumberWithPercentBoost,
+} from './helpers';
 import { AppService } from './../../app.service';
 
 export class InfoCommand extends Command {
@@ -23,17 +28,26 @@ export class InfoCommand extends Command {
           const d1 = moment(player.lastWateringDate);
           const d2 = moment(new Date());
           const diff = d2.diff(d1, 'minutes');
-          const needDiff = 60;
+          const needDiff = calcNumberWithPercentBoost(
+            60,
+            player.config.cooldowns.watering,
+          );
 
           const d1Pray = moment(player.lastPrayDate);
           const d2Pray = moment(new Date());
           const diffPray = d2Pray.diff(d1Pray, 'minutes');
-          const needDiffPray = 1440;
+          const needDiffPray = calcNumberWithPercentBoost(
+            1440,
+            player.config.cooldowns.pray,
+          );
 
           const d1A = moment(player.lastADate);
           const d2A = moment(new Date());
           const diffA = d2A.diff(d1A, 'minutes');
-          const needDiffA = 1440;
+          const needDiffA = calcNumberWithPercentBoost(
+            1440,
+            player.config.cooldowns.adate,
+          );
 
           let watering = '';
           let pray = '';
@@ -80,6 +94,7 @@ export class InfoCommand extends Command {
             maxProgress.progress,
             maxProgress.factor,
             hourProgress,
+            player,
           )}ч.**`;
 
           const gameTime = `Игровое время: **${moment(new Date()).format(

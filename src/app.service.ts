@@ -4,12 +4,13 @@ import { configService } from './config/config.service';
 import { Cron } from '@nestjs/schedule';
 import config from './morkovko/config';
 import { EmbedBuilder } from 'discord.js';
+import { calcSlotProgress } from './morkovko/commands/helpers';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { Repository, Raw } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PlayerEntity } from './entities/player.entity';
-import { PlayerDTO } from './dto/player.dto';
+import { PlayerDTO, PlayerReqDTO } from './dto/player.dto';
 
 const hourProgress = config.bot.hourProgress;
 const mafiaChannelId = configService.getMorkovkoChannel();
@@ -22,7 +23,7 @@ export class AppService {
     private playerRepository: Repository<PlayerEntity>,
   ) {}
 
-  @Cron('0 0 * * * *')
+  @Cron('0 11 * * * *')
   async gameTick() {
     const tStart = performance.now();
     try {
@@ -33,18 +34,29 @@ export class AppService {
         slotsCount += slots.length;
 
         for (const slot of slots) {
-          const factor = slot.factor === 0 ? 1 : slot.factor;
-          const progress = slot.progress === 0 ? 1 : slot.progress;
-          const newProgress = progress + hourProgress;
-          const progressWithFactor = (newProgress / 100) * factor + newProgress;
+          const progressWithFactor = calcSlotProgress(
+            slot,
+            player.progressBonus,
+            hourProgress,
+            player.config.slotSpeedUpdate,
+          );
 
           if (progressWithFactor >= 100) {
-            player.carrotCount += 1;
+            player.carrotCount += 1 * player.progressBonus;
             slot.factor = 0;
             slot.progress = 0;
           } else {
             slot.progress = progressWithFactor;
           }
+        }
+
+        if (
+          !player.hasPugalo &&
+          player.points >= config.bot.economy.pugalo &&
+          player.config.autoBuyPugalo
+        ) {
+          player.hasPugalo = true;
+          player.points -= config.bot.economy.pugalo;
         }
 
         this.savePlayer(player);
@@ -155,7 +167,7 @@ export class AppService {
     });
   }
 
-  createPlayer(player: PlayerDTO): Promise<{ status: number }> {
+  createPlayer(player: PlayerReqDTO): Promise<{ status: number }> {
     return new Promise(async (resolve, reject) => {
       const playerRow: PlayerDTO = new PlayerEntity();
       Object.assign(playerRow, {
@@ -177,7 +189,7 @@ export class AppService {
   checkUser(userId: string): Promise<{ status: number; player?: PlayerDTO }> {
     return new Promise(async (resolve, reject) => {
       try {
-        const player = await this.playerRepository.findOne({
+        const player: PlayerDTO = await this.playerRepository.findOne({
           where: { userId },
         });
 

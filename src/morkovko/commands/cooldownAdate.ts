@@ -1,13 +1,8 @@
 import Command from './Command';
-import * as moment from 'moment';
-import {
-  setEmbedAuthor,
-  getTimeFromMins,
-  calcNumberWithPercentBoost,
-} from './helpers';
+import { setEmbedAuthor } from './helpers';
 import { AppService } from './../../app.service';
 
-export class WateringCommand extends Command {
+export class CACommand extends Command {
   constructor(commandName: string) {
     super(commandName);
   }
@@ -20,27 +15,25 @@ export class WateringCommand extends Command {
   ) {
     this.initCommand(message, args, service, isSlash, () => {
       const user = this.getUser();
+      const { cooldowns } = this.config.bot.economy;
       service.checkUser(user.id).then((res) => {
-        if (res.status === 200) {
+        if (res.status === 200 && res.player) {
           const player = res.player;
-          const d1 = moment(res.player.lastWateringDate);
-          const d2 = moment(new Date());
-          const diff = d2.diff(d1, 'minutes');
-          const needDiff = calcNumberWithPercentBoost(
-            60,
-            player.config.cooldowns.watering,
-          );
-
-          if (diff >= needDiff) {
-            service.watering(res.player).then((resWatering) => {
-              if (resWatering.status === 200) {
-                this.embed.setDescription(`Морковка полита!`);
+          const price = cooldowns.adate;
+          if (player.points >= price) {
+            player.config.cooldowns.adate += 1;
+            player.points -= price;
+            service.savePlayer(player).then((resSave) => {
+              if (resSave.status === 200) {
+                this.embed.setDescription(
+                  `Ты уменьшил кулдаун свидания на 1%. Текущий бонус **${player.config.cooldowns.adate}%**`,
+                );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
                 });
               } else {
                 this.embed.setDescription(
-                  `Не получилось полить морковку, попробуй позже!`,
+                  `Не получилось купить бонус. Попробуй позже.`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
@@ -49,9 +42,7 @@ export class WateringCommand extends Command {
             });
           } else {
             this.embed.setDescription(
-              `Ты сможешь полить морковку не раньше чем через ${getTimeFromMins(
-                needDiff - diff,
-              )}!`,
+              `Тебе не хватает ${price - player.points}🔸!`,
             );
             this.send({
               embeds: [setEmbedAuthor(this.embed, user)],

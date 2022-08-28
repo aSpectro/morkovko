@@ -38,12 +38,20 @@ export class InventoryCommand extends Command {
             }
           }
           const p = Math.round(maxProgress.progress);
-          this.embed.setDescription(`Твой инвентарь\n
-          Ближайшая к созреванию морковка: **${p}%**. Осталось примерно **${calcTime(
+          this.embed.setDescription(`**Инвентарь**\n
+          Твой постоянный бонус прогресса **${
+            player.progressBonus
+          }**\nБлижайшая к созреванию морковка: **${p}%**. Осталось примерно **${calcTime(
             maxProgress.progress,
             maxProgress.factor,
             this.config.bot.hourProgress,
-          )}ч.**\nПугало: ${player.hasPugalo ? '**есть**' : '**нет**'}`);
+            player,
+          )}ч.**\n
+          Пугало: ${
+            player.hasPugalo ? '**есть**' : '**нет**'
+          }\nАвтопокупка пугала: ${
+            player.config.autoBuyPugalo ? '**активна**' : '**нет**'
+          }`);
           this.embed.addFields(
             {
               name: 'Морковок',
@@ -58,6 +66,26 @@ export class InventoryCommand extends Command {
             {
               name: 'Горшков',
               value: `🧺 **${playerSlots}/${maxSlots}**`,
+              inline: true,
+            },
+            {
+              name: 'Бонус скорости роста',
+              value: `📈 **${player.config.slotSpeedUpdate}%**`,
+              inline: true,
+            },
+            {
+              name: 'Бонус кулдауна свидания',
+              value: `👨🏻‍🤝‍👨🏻 **${player.config.cooldowns.adate}%**`,
+              inline: true,
+            },
+            {
+              name: 'Бонус кулдауна полива',
+              value: `💧 **${player.config.cooldowns.watering}%**`,
+              inline: true,
+            },
+            {
+              name: 'Бонус кулдауна молитвы',
+              value: `🙏 **${player.config.cooldowns.pray}%**`,
               inline: true,
             },
           );

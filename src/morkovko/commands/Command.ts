@@ -49,7 +49,10 @@ export default abstract class Command {
     return this.isSlash ? this.message.user : this.message.author;
   }
 
-  public replyNoUser(user) {
+  public replyNoUser(user, troll?) {
+    if (troll) {
+
+    }
     this.send({ embeds: [noUserEmbed(user)] });
   }
 
@@ -68,5 +71,20 @@ export default abstract class Command {
   public getRandomAvatar() {
     const carrotNum = randomIntFromInterval(1, this.config.bot.carrotsLimit);
     return `./outputs/carrots/${carrotNum}.png`;
+  }
+
+  public resetPlayer(player) {
+    player.carrotSize = 1;
+    player.carrotCount = 0;
+    player.points = 0;
+    player.hasPugalo = false;
+    player.relations = [];
+    player.slots = [
+      {
+        progress: 0,
+        factor: 0,
+      },
+    ];
+    return player;
   }
 }

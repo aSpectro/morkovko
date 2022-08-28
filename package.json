@@ -1,10 +1,10 @@
 {
   "name": "morkovko",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "version": "0.2.3",
+  "description": "Discord бот - Nest.js, PostgreSQL, Discord.js",
+  "author": "aSpectro",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",

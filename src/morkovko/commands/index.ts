@@ -16,6 +16,12 @@ import { InfoCommand } from './info';
 import { AdateCommand } from './adate';
 import { FriendCommand } from './friend';
 import { PugaloCommand } from './pugalo';
+import { ABPCommand } from './autoBuyPugalo';
+import { GRCommand } from './growthRate';
+import { CACommand } from './cooldownAdate';
+import { CWCommand } from './cooldownWatering';
+import { CPCommand } from './cooldownPray';
+
 import { NCCommand } from './admin/nc'; // обнулить морковки
 import { NPCommand } from './admin/np'; // обнулить очки
 import { GCCommand } from './admin/gc'; // выдать морковки игроку
@@ -40,6 +46,11 @@ export default [
   new AdateCommand('свидание'),
   new FriendCommand('игрок'),
   new PugaloCommand('пугало'),
+  new ABPCommand('автопокупка-пугала'),
+  new GRCommand('скорость-роста'),
+  new CACommand('кулдаун-свидание'),
+  new CWCommand('кулдаун-полив'),
+  new CPCommand('кулдаун-молитва'),
   // admin commands
   new NCCommand('nc'),
   new NPCommand('np'),

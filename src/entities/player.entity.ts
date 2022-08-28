@@ -5,7 +5,17 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
-import { Slot, Relation } from '../dto/player.dto';
+import { Slot, Relation, Config } from '../dto/player.dto';
+
+const config = {
+  autoBuyPugalo: false,
+  slotSpeedUpdate: 0,
+  cooldowns: {
+    adate: 0,
+    watering: 0,
+    pray: 0,
+  },
+};
 
 @Entity()
 export class PlayerEntity {
@@ -23,6 +33,9 @@ export class PlayerEntity {
 
   @Column({ type: 'int4', nullable: false, default: 1 })
   carrotSize: number;
+
+  @Column({ type: 'int4', nullable: false, default: 1 })
+  progressBonus: number;
 
   @Column({ type: 'boolean', nullable: false, default: false })
   hasPugalo: boolean;
@@ -47,17 +60,7 @@ export class PlayerEntity {
 
   @Column({ type: 'jsonb', nullable: true })
   relations: Relation[];
-}
 
-// id - uuid
-// userId - id discord
-// carrotCount - carrots count
-// points - points count
-// slots [
-//   {
-//     progress - % роста
-//     factor - % ускорения
-//   }
-// ]
-// carrotSize - размер морковки на конкурс (в см?)
-// carrotAvatar - на будущее для генерации аватарок морковок
+  @Column({ type: 'jsonb', default: config })
+  config: Config;
+}

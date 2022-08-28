@@ -1,6 +1,10 @@
 import Command from './Command';
 import * as moment from 'moment';
-import { setEmbedAuthor, getTimeFromMins } from './helpers';
+import {
+  setEmbedAuthor,
+  getTimeFromMins,
+  calcNumberWithPercentBoost,
+} from './helpers';
 import { AppService } from './../../app.service';
 
 const counts = [5, 10, 15, 20];
@@ -24,11 +28,14 @@ export class PrayCommand extends Command {
           const d1 = moment(player.lastPrayDate);
           const d2 = moment(new Date());
           const diff = d2.diff(d1, 'minutes');
-          const needDiff = 1440;
+          const needDiff = calcNumberWithPercentBoost(
+            1440,
+            player.config.cooldowns.pray,
+          );
 
           if (diff >= needDiff) {
-            const prayCarrots =
-              counts[Math.floor(Math.random() * counts.length)];
+            let prayCarrots = counts[Math.floor(Math.random() * counts.length)];
+            prayCarrots *= player.progressBonus;
             player.lastPrayDate = moment(new Date()).toDate();
             player.carrotCount += prayCarrots;
             service.savePlayer(player).then((resSave) => {

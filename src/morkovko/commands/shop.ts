@@ -20,7 +20,14 @@ export class ShopCommand extends Command {
   ) {
     this.initCommand(message, args, service, isSlash, () => {
       const user = this.getUser();
-      const { pugalo, slot, upgrade } = this.config.bot.economy;
+      const {
+        pugalo,
+        slot,
+        upgrade,
+        slotSpeedUpdate,
+        autoBuyPugalo,
+        cooldowns,
+      } = this.config.bot.economy;
       service.checkUser(user.id).then((res) => {
         if (res.status === 200) {
           const player = res.player;
@@ -52,6 +59,31 @@ export class ShopCommand extends Command {
             {
               name: '!пугало',
               value: `Купить пугало за ${pugalo} 🔸, которое отпугивает мафию, но в обед и полночь ваш сосед ворует ваше пугало`,
+              inline: true,
+            },
+            {
+              name: '!скорость-роста',
+              value: `Увеличить скорость роста морковок на **1%** за ${slotSpeedUpdate} 🔸.`,
+              inline: true,
+            },
+            {
+              name: '!автопокупка-пугала',
+              value: `Купить автопокупку пугала за ${autoBuyPugalo} 🔸. Пугало будет покупаться автоматически при наличии необходимого кол-ва 🔸 на счету.`,
+              inline: true,
+            },
+            {
+              name: '!кулдаун-свидание',
+              value: `Уменьшить кулдаун свидания за ${cooldowns.adate} 🔸 на **1%**.`,
+              inline: true,
+            },
+            {
+              name: '!кулдаун-полив',
+              value: `Уменьшить кулдаун полива за ${cooldowns.watering} 🔸 на **1%**.`,
+              inline: true,
+            },
+            {
+              name: '!кулдаун-молитва',
+              value: `Уменьшить кулдаун молитвы за ${cooldowns.pray} 🔸 на **1%**.`,
               inline: true,
             },
           );

@@ -1,6 +1,10 @@
 import Command from './Command';
 import * as moment from 'moment';
-import { setEmbedAuthor, getTimeFromMins } from './helpers';
+import {
+  setEmbedAuthor,
+  getTimeFromMins,
+  calcNumberWithPercentBoost,
+} from './helpers';
 import { AppService } from './../../app.service';
 
 export class AdateCommand extends Command {
@@ -23,7 +27,10 @@ export class AdateCommand extends Command {
           const d1 = moment(player.lastADate);
           const d2 = moment(new Date());
           const diff = d2.diff(d1, 'minutes');
-          const needDiff = 1440;
+          const needDiff = calcNumberWithPercentBoost(
+            1440,
+            player.config.cooldowns.adate,
+          );
           if (userFriends && userFriends.length > 0) {
             if (diff >= needDiff) {
               const successChance = Math.random() * 100;

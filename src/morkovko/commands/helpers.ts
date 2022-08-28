@@ -53,13 +53,21 @@ export function getTimeFromMins(mins: number) {
   return hours + 'ч. ' + minutes + 'м.';
 }
 
-export function calcTime(n, f, t) {
+export function calcTime(n, f, t, p) {
   let r = n;
   let count = 0;
   const len = 100 / t;
+  const pBonus = p.progressBonus === 1 ? 0 : p.progressBonus;
+  const speedBonus =
+    p.config.slotSpeedUpdate === 1 ? 0 : p.config.slotSpeedUpdate;
   for (let i = 0; i < len; i++) {
-    const a = r + t;
-    r = (a / 100) * f + a;
+    const factor = f === 0 ? 1 : f;
+    let hourProgressFinal = t;
+    hourProgressFinal += (hourProgressFinal / 100) * pBonus;
+    hourProgressFinal += (hourProgressFinal / 100) * speedBonus;
+    hourProgressFinal += (hourProgressFinal / 100) * factor;
+    const newProgress = r + hourProgressFinal;
+    r = newProgress;
     if (r >= 100 && count == 0) count = i + 1;
   }
   return count;
@@ -84,4 +92,26 @@ export function getMaxSlots(carrotLevel) {
 
 export function getChance() {
   return Math.random() * 100;
+}
+
+export function calcSlotProgress(
+  slot,
+  progressBonus,
+  hourProgress,
+  slotSpeedUpdate,
+) {
+  const pBonus = progressBonus === 1 ? 0 : progressBonus;
+  const speedBonus = slotSpeedUpdate === 1 ? 0 : slotSpeedUpdate;
+  const factor = slot.factor === 0 ? 1 : slot.factor;
+  let hourProgressFinal = hourProgress;
+  hourProgressFinal += (hourProgressFinal / 100) * pBonus;
+  hourProgressFinal += (hourProgressFinal / 100) * speedBonus;
+  hourProgressFinal += (hourProgressFinal / 100) * factor;
+  const progress = slot.progress === 0 ? 1 : slot.progress;
+  const newProgress = progress + hourProgressFinal;
+  return newProgress;
+}
+
+export function calcNumberWithPercentBoost(number, boost) {
+  return number - (number / 100) * boost;
 }
