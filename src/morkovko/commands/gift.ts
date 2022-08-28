@@ -36,7 +36,7 @@ export class GiftCommand extends Command {
                 playerMention.carrotCount += count;
 
                 let level = 0;
-                const levelBoost = Math.round((count / 100) * 2 + 1);
+                const levelBoost = Math.round((count / 5) * 2 + 1);
 
                 if (player.relations) {
                   const relUser = player.relations.find(
