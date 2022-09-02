@@ -20,7 +20,7 @@ export class SellCommand extends Command {
         if (res.status === 200) {
           const player = res.player;
           const grabChance = getChance();
-          const grabPercent = player.slotsCount >= 50 ? 10 : 5;
+          const grabPercent = player.slotsCount >= 50 ? 15 : 5;
           let grab = false;
           if (grabChance <= grabPercent) grab = true;
           const count = this.getArgString('кол-во');
