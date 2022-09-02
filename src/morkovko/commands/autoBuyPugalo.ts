@@ -19,8 +19,8 @@ export class ABPCommand extends Command {
       service.checkUser(user.id).then((res) => {
         if (res.status === 200 && res.player) {
           const player = res.player;
-          const price = autoBuyPugalo;
-          if (player.points >= price && !player.config.autoBuyPugalo) {
+          const price = this.getPrice(player.slotsCount, autoBuyPugalo);
+          if (player.points >= price && !player.config.autoBuyPugalo && this.canBuy(player.carrotSize, 'autoBuyPugalo')) {
             player.config.autoBuyPugalo = true;
             player.points -= price;
             service.savePlayer(player).then((resSave) => {
@@ -43,6 +43,10 @@ export class ABPCommand extends Command {
           } else {
             if (player.config.autoBuyPugalo) {
               this.embed.setDescription(`У тебя уже есть бонус!`);
+            } else if (!this.canBuy(player.carrotSize, 'autoBuyPugalo')) {
+              this.embed.setDescription(
+                `Ты не можешь купить этот бонус, твоя морковка слишком маленькая!`,
+              );
             } else {
               this.embed.setDescription(
                 `Тебе не хватает ${price - player.points}🔸!`,

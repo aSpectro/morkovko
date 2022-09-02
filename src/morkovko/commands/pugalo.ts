@@ -19,7 +19,7 @@ export class PugaloCommand extends Command {
       service.checkUser(user.id).then((res) => {
         if (res.status === 200) {
           const player = res.player;
-          const price = pugalo;
+          const price = this.getPrice(player.slotsCount, pugalo);
           if (player.points >= price && !player.hasPugalo) {
             player.hasPugalo = true;
             player.points -= price;

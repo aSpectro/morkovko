@@ -94,22 +94,20 @@ export function getChance() {
   return Math.random() * 100;
 }
 
-export function calcSlotProgress(
-  slot,
+export function calcProgress(
+  slots,
   progressBonus,
-  hourProgress,
+  factorSpeed,
   slotSpeedUpdate,
 ) {
   const pBonus = progressBonus === 1 ? 0 : progressBonus;
   const speedBonus = slotSpeedUpdate === 1 ? 0 : slotSpeedUpdate;
-  const factor = slot.factor === 0 ? 1 : slot.factor;
-  let hourProgressFinal = hourProgress;
-  hourProgressFinal += (hourProgressFinal / 100) * pBonus;
-  hourProgressFinal += (hourProgressFinal / 100) * speedBonus;
-  hourProgressFinal += (hourProgressFinal / 100) * factor;
-  const progress = slot.progress === 0 ? 1 : slot.progress;
-  const newProgress = progress + hourProgressFinal;
-  return newProgress;
+  const factor = factorSpeed === 0 ? 1 : factorSpeed;
+  let progress = slots;
+  progress += (progress / 100) * pBonus;
+  progress += (progress / 100) * speedBonus;
+  progress += (progress / 100) * factor;
+  return Math.floor(progress);
 }
 
 export function calcNumberWithPercentBoost(number, boost) {

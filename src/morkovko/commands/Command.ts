@@ -79,12 +79,7 @@ export default abstract class Command {
     player.points = 0;
     player.hasPugalo = false;
     player.relations = [];
-    player.slots = [
-      {
-        progress: 0,
-        factor: 0,
-      },
-    ];
+    player.slotsCount = 1;
     player.config = {
       autoBuyPugalo: false,
       slotSpeedUpdate: 0,
@@ -95,5 +90,21 @@ export default abstract class Command {
       },
     }
     return player;
+  }
+
+  public getPrice(factor, price) {
+    return Math.round((factor / 50) * price + price);
+  }
+
+  public getExitCarrotSize(currentProgress) {
+    if (currentProgress === 1) return 100;
+    return currentProgress * 30 + 100;
+  }
+
+  public canBuy(carrotSize, key) {
+    if (carrotSize >= this.config.bot.economy.shopRules[key]) {
+      return true;
+    }
+    return;
   }
 }

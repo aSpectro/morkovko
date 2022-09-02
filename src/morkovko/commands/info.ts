@@ -3,7 +3,6 @@ import * as moment from 'moment';
 import {
   setEmbedAuthor,
   getTimeFromMins,
-  calcTime,
   calcNumberWithPercentBoost,
 } from './helpers';
 import { AppService } from './../../app.service';
@@ -21,7 +20,6 @@ export class InfoCommand extends Command {
   ) {
     this.initCommand(message, args, service, isSlash, () => {
       const user = this.getUser();
-      const hourProgress = this.config.bot.hourProgress;
       service.checkUser(user.id).then((res) => {
         if (res.status === 200) {
           const player = res.player;
@@ -51,7 +49,6 @@ export class InfoCommand extends Command {
 
           let watering = '';
           let pray = '';
-          let carrot = '';
           let adate = '';
 
           if (diff >= needDiff) {
@@ -78,31 +75,23 @@ export class InfoCommand extends Command {
             )}\n`;
           }
 
-          let maxProgress = player.slots[0];
-          for (const slot of player.slots) {
-            if (slot.progress > maxProgress.progress) {
-              maxProgress = slot;
-            } else if (
-              slot.progress === maxProgress.progress &&
-              slot.factor > maxProgress.factor
-            ) {
-              maxProgress = slot;
-            }
-          }
-          const p = Math.round(maxProgress.progress);
-          carrot = `📈 Ближайшая к созреванию морковка: **${p}%**. Осталось примерно **${calcTime(
-            maxProgress.progress,
-            maxProgress.factor,
-            hourProgress,
-            player,
-          )}ч.**`;
-
           const gameTime = `Игровое время: **${moment(new Date()).format(
             'HH:mm',
           )}**\n`;
 
+          let exit = '';
+          if (
+            player.carrotSize >= this.getExitCarrotSize(player.progressBonus)
+          ) {
+            exit = `Можно выкти и получить бонусы!`;
+          } else {
+            exit = `Чтобы выкти, нужно вырастить морковку еще на **${
+              this.getExitCarrotSize(player.progressBonus) - player.carrotSize
+            }см**`;
+          }
+
           this.embed.setDescription(
-            `${gameTime + watering + pray + adate + carrot}`,
+            `${gameTime + watering + pray + adate + exit}`,
           );
           this.send({ embeds: [setEmbedAuthor(this.embed, user)] });
         } else {

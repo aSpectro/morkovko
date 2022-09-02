@@ -18,12 +18,6 @@ export class StartCommand extends Command {
       const player = {
         userId: user.id,
         carrotAvatar: this.getRandomAvatar(),
-        slots: [
-          {
-            progress: 0,
-            factor: 0,
-          },
-        ],
       };
       service.createPlayer(player).then((res) => {
         if (res.status === 200) {

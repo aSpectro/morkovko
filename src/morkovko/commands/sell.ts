@@ -15,13 +15,14 @@ export class SellCommand extends Command {
   ) {
     this.initCommand(message, args, service, isSlash, () => {
       const user = this.getUser();
-      const grabChance = getChance();
-      let grab = false;
-      if (grabChance <= 5) grab = true;
 
       service.checkUser(user.id).then((res) => {
         if (res.status === 200) {
           const player = res.player;
+          const grabChance = getChance();
+          const grabPercent = player.slotsCount >= 50 ? 10 : 5;
+          let grab = false;
+          if (grabChance <= grabPercent) grab = true;
           const count = this.getArgString('кол-во');
           if (count && player.carrotCount >= count) {
             if (player.carrotCount === 1) grab = false;

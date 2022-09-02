@@ -12,6 +12,12 @@ export default {
     clientId: configService.getClientId(),
     guildId: configService.geGuildId(),
     economy: {
+      exitStars: 100,
+      shopRules: {
+        autoBuyPugalo: 200,
+        slotSpeedUpdate: 100,
+        cooldowns: 150,
+      },
       maxGiftCount: 10,
       pugalo: 1,
       upgrade: 5,

@@ -31,6 +31,9 @@ export class PlayerEntity {
   @Column({ type: 'int4', nullable: false, default: 0 })
   points: number;
 
+  @Column({ type: 'int4', nullable: false, default: 0 })
+  stars: number;
+
   @Column({ type: 'int4', nullable: false, default: 1 })
   carrotSize: number;
 
@@ -39,6 +42,9 @@ export class PlayerEntity {
 
   @Column({ type: 'int4', nullable: false, default: 3 })
   dailyGiftCount: number;
+
+  @Column({ type: 'int4', nullable: false, default: 0 })
+  factorSpeed: number;
 
   @Column({ type: 'boolean', nullable: false, default: false })
   hasPugalo: boolean;
@@ -60,6 +66,9 @@ export class PlayerEntity {
 
   @Column({ type: 'jsonb' })
   slots: Slot[];
+
+  @Column({ type: 'int4', nullable: false, default: 0 })
+  slotsCount: number;
 
   @Column({ type: 'jsonb', nullable: true })
   relations: Relation[];

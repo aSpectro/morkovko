@@ -1,5 +1,5 @@
 import Command from './Command';
-import { setEmbedAuthor, calcPrice, getCarrotLevel } from './helpers';
+import { setEmbedAuthor } from './helpers';
 import { AppService } from './../../app.service';
 
 export class UpgradeCommand extends Command {
@@ -19,8 +19,7 @@ export class UpgradeCommand extends Command {
       service.checkUser(user.id).then((res) => {
         if (res.status === 200) {
           const player = res.player;
-          const carrotLevel = getCarrotLevel(player.carrotSize);
-          const price = calcPrice(player.slots.length, upgrade);
+          const price = this.getPrice(player.slotsCount, upgrade);
           const count = this.getArgString('кол-во');
           if (count && player.points >= count * price && count <= 5) {
             player.carrotSize += count;

@@ -1,6 +1,7 @@
 import Command from './Command';
 import { setEmbedAuthor } from './helpers';
 import { AppService } from './../../app.service';
+import e from 'express';
 
 export class GRCommand extends Command {
   constructor(commandName: string) {
@@ -19,8 +20,8 @@ export class GRCommand extends Command {
       service.checkUser(user.id).then((res) => {
         if (res.status === 200 && res.player) {
           const player = res.player;
-          const price = slotSpeedUpdate;
-          if (player.points >= price) {
+          const price = this.getPrice(player.slotsCount, slotSpeedUpdate);
+          if (player.points >= price && this.canBuy(player.carrotSize, 'slotSpeedUpdate')) {
             player.config.slotSpeedUpdate += 1;
             player.points -= price;
             service.savePlayer(player).then((resSave) => {
@@ -41,9 +42,15 @@ export class GRCommand extends Command {
               }
             });
           } else {
-            this.embed.setDescription(
-              `Тебе не хватает ${price - player.points}🔸!`,
-            );
+            if (!this.canBuy(player.carrotSize, 'slotSpeedUpdate')) {
+              this.embed.setDescription(
+                `Ты не можешь купить этот бонус, твоя морковка слишком маленькая!`,
+              );
+            } else {
+              this.embed.setDescription(
+                `Тебе не хватает ${price - player.points}🔸!`,
+              );
+            }
             this.send({
               embeds: [setEmbedAuthor(this.embed, user)],
             });

@@ -19,8 +19,8 @@ export class CPCommand extends Command {
       service.checkUser(user.id).then((res) => {
         if (res.status === 200 && res.player) {
           const player = res.player;
-          const price = cooldowns.pray;
-          if (player.points >= price) {
+          const price = this.getPrice(player.slotsCount, cooldowns.pray);
+          if (player.points >= price && this.canBuy(player.carrotSize, 'cooldowns')) {
             player.config.cooldowns.pray += 1;
             player.points -= price;
             service.savePlayer(player).then((resSave) => {
@@ -41,9 +41,15 @@ export class CPCommand extends Command {
               }
             });
           } else {
-            this.embed.setDescription(
-              `Тебе не хватает ${price - player.points}🔸!`,
-            );
+            if (!this.canBuy(player.carrotSize, 'cooldowns')) {
+              this.embed.setDescription(
+                `Ты не можешь купить этот бонус, твоя морковка слишком маленькая!`,
+              );
+            } else {
+              this.embed.setDescription(
+                `Тебе не хватает ${price - player.points}🔸!`,
+              );
+            }
             this.send({
               embeds: [setEmbedAuthor(this.embed, user)],
             });

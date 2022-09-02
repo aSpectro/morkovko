@@ -1,10 +1,5 @@
 import Command from './Command';
-import {
-  setEmbedAuthor,
-  calcTime,
-  getCarrotLevel,
-  getMaxSlots,
-} from './helpers';
+import { setEmbedAuthor, getCarrotLevel, getMaxSlots } from './helpers';
 import { AppService } from './../../app.service';
 
 export class InventoryCommand extends Command {
@@ -24,29 +19,10 @@ export class InventoryCommand extends Command {
         if (res.status === 200) {
           const player = res.player;
           const maxSlots = getMaxSlots(getCarrotLevel(player.carrotSize));
-          const playerSlots = player.slots.length;
+          const playerSlots = player.slotsCount;
 
-          let maxProgress = player.slots[0];
-          for (const slot of player.slots) {
-            if (slot.progress > maxProgress.progress) {
-              maxProgress = slot;
-            } else if (
-              slot.progress === maxProgress.progress &&
-              slot.factor > maxProgress.factor
-            ) {
-              maxProgress = slot;
-            }
-          }
-          const p = Math.round(maxProgress.progress);
           this.embed.setDescription(`**Инвентарь**\n
-          Твой постоянный бонус прогресса **${
-            player.progressBonus
-          }**\nБлижайшая к созреванию морковка: **${p}%**. Осталось примерно **${calcTime(
-            maxProgress.progress,
-            maxProgress.factor,
-            this.config.bot.hourProgress,
-            player,
-          )}ч.**\n
+          Твой постоянный бонус прогресса **${player.progressBonus}**\n
           Пугало: ${
             player.hasPugalo ? '**есть**' : '**нет**'
           }\nАвтопокупка пугала: ${
@@ -66,6 +42,11 @@ export class InventoryCommand extends Command {
             {
               name: 'Горшков',
               value: `🧺 **${playerSlots}/${maxSlots}**`,
+              inline: true,
+            },
+            {
+              name: 'Звезд',
+              value: `⭐ ${player.stars.toLocaleString()}`,
               inline: true,
             },
             {

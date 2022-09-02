@@ -35,6 +35,9 @@ export interface PlayerDTO {
   progressBonus: number;
   config: Config;
   dailyGiftCount: number;
+  factorSpeed: number;
+  slotsCount: number;
+  stars: number;
 }
 
 export interface PlayerReqDTO {
@@ -43,5 +46,4 @@ export interface PlayerReqDTO {
   lastWateringDate?: Date;
   lastPrayDate?: Date;
   lastADate?: Date;
-  slots: Slot[];
 }

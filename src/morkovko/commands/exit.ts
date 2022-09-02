@@ -26,14 +26,18 @@ export class ExitCommand extends Command {
             );
           };
           if (userFriends && userFriends.length > 0) {
-            if (player.carrotSize >= 100) {
+            if (
+              player.carrotSize >= this.getExitCarrotSize(player.progressBonus)
+            ) {
               this.resetPlayer(player);
               player.progressBonus += 1;
+              player.stars += this.config.bot.economy.exitStars;
               this.service.savePlayer(player).then((resSave) => {
                 if (resSave.status === 200) {
                   this.embed.setDescription(
                     `Твоя морковка достаточно большая, ты успешно вышел из игры, твой прогресс был сброшен! Поздравляю 💚!\n
-                    Теперь у тебя постоянный бонус ${player.progressBonus}% к скорости роста морковки и x${player.progressBonus} кол-ву выращенной морковки и за молитву.`,
+                    Теперь у тебя постоянный бонус ${player.progressBonus}% к скорости роста морковки и x${player.progressBonus} кол-ву выращенной морковки и за молитву.\n
+                    Так же ты получил **${this.config.bot.economy.exitStars}**⭐. Звезды можно будет обменять в специальном магазине на доп. бонусы.`,
                   );
                   this.send({
                     embeds: [setEmbedAuthor(this.embed, user)],

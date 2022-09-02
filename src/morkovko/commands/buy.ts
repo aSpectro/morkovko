@@ -19,26 +19,21 @@ export class BuyCommand extends Command {
       service.checkUser(user.id).then((res) => {
         if (res.status === 200) {
           const player = res.player;
-          const price = slot;
+          const price = this.getPrice(player.slotsCount, slot);
           const maxSlots = getMaxSlots(getCarrotLevel(player.carrotSize));
-          const playerSlots = player.slots.length;
+          const playerSlots = player.slotsCount;
           const count = this.getArgString('кол-во');
           if (
             count &&
             player.points >= count * price &&
             playerSlots + count <= maxSlots
           ) {
-            for (let i = 0; i < count; i++) {
-              player.slots.push({
-                progress: 0,
-                factor: 0,
-              });
-            }
+            player.slotsCount += count;
             player.points -= price * count;
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Ты купил ${count}🧺. Теперь у тебя **${player.slots.length}** 🧺!`,
+                  `Ты купил ${count}🧺. Теперь у тебя **${player.slotsCount}** 🧺!`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],

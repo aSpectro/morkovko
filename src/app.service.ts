@@ -4,7 +4,7 @@ import { configService } from './config/config.service';
 import { Cron } from '@nestjs/schedule';
 import config from './morkovko/config';
 import { EmbedBuilder } from 'discord.js';
-import { calcSlotProgress } from './morkovko/commands/helpers';
+import { calcProgress, calcPrice } from './morkovko/commands/helpers';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
@@ -12,7 +12,6 @@ import { Repository } from 'typeorm';
 import { PlayerEntity } from './entities/player.entity';
 import { PlayerDTO, PlayerReqDTO } from './dto/player.dto';
 
-const hourProgress = config.bot.hourProgress;
 const mafiaChannelId = configService.getMorkovkoChannel();
 
 @Injectable()
@@ -23,54 +22,49 @@ export class AppService {
     private playerRepository: Repository<PlayerEntity>,
   ) {}
 
-  @Cron('0 11 * * * *')
-  async gameTick() {
-    const tStart = performance.now();
+  async slotsMigration() {
     try {
       const data: PlayerDTO[] = await this.playerRepository.find();
-      let slotsCount = 0;
       for (const player of data) {
-        const slots = player.slots;
-        slotsCount += slots.length;
-
-        for (const slot of slots) {
-          const progressWithFactor = calcSlotProgress(
-            slot,
-            player.progressBonus,
-            hourProgress,
-            player.config.slotSpeedUpdate,
-          );
-
-          if (progressWithFactor >= 100) {
-            player.carrotCount += 1 * player.progressBonus;
-            slot.factor = 0;
-            slot.progress = 0;
-          } else {
-            slot.progress = progressWithFactor;
-          }
-        }
-
-        if (
-          !player.hasPugalo &&
-          player.points >= config.bot.economy.pugalo &&
-          player.config.autoBuyPugalo
-        ) {
-          player.hasPugalo = true;
-          player.points -= config.bot.economy.pugalo;
-        }
-
+        player.slotsCount = player.slots.length;
         this.savePlayer(player);
       }
-      const tEnd = performance.now();
-      console.log('gameTick performance: ' + (tEnd - tStart) + ' milliseconds');
-      console.log(`Всего горшков: ${slotsCount}`);
-      console.log(`Всего игроков: ${data.length}`);
     } catch (error) {
       console.log(error);
     }
   }
 
-  @Cron('0 0 */12 * * *')
+  @Cron('0 * * * * *')
+  async gameTick() {
+    try {
+      const data: PlayerDTO[] = await this.playerRepository.find();
+      for (const player of data) {
+        const slots = player.slotsCount;
+        player.carrotCount +=
+          calcProgress(
+            slots,
+            player.progressBonus,
+            player.factorSpeed,
+            player.config.slotSpeedUpdate,
+          ) * player.progressBonus;
+
+        if (
+          !player.hasPugalo &&
+          player.points >= calcPrice(slots, config.bot.economy.pugalo) &&
+          player.config.autoBuyPugalo
+        ) {
+          player.hasPugalo = true;
+          player.points -= calcPrice(slots, config.bot.economy.pugalo);
+        }
+
+        this.savePlayer(player);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Cron('30 0 */12 * * *')
   async gameMafia() {
     if (!configService.isProduction()) return;
     try {
@@ -80,14 +74,12 @@ export class AppService {
         },
       });
       const prey = data[Math.floor(Math.random() * data.length)];
-      const preySlotsCount = prey ? prey.slots.length : 1;
+      const preySlotsCount = prey ? prey.slotsCount : 1;
       const embed = new EmbedBuilder().setColor('#f97a50');
       if (preySlotsCount > 1) {
         const grab = Math.floor(preySlotsCount / 2);
         const preyGrabCount = grab === 0 ? 1 : grab;
-        for (let i = 0; i < preyGrabCount; i++) {
-          prey.slots.pop();
-        }
+        prey.slotsCount -= preyGrabCount;
         this.savePlayer(prey).then((res) => {
           if (res.status === 200) {
             embed.setDescription(
@@ -122,7 +114,22 @@ export class AppService {
     }
   }
 
-  @Cron('0 0 1 * * *')
+  @Cron('30 30 */12 * * *')
+  async resetWatering() {
+    try {
+      await this.playerRepository
+        .createQueryBuilder()
+        .update()
+        .set({
+          factorSpeed: 0,
+        })
+        .execute();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Cron('30 0 1 * * *')
   async resetGifts() {
     try {
       await this.playerRepository
@@ -252,9 +259,7 @@ export class AppService {
 
   watering(player: PlayerDTO): Promise<{ status: number }> {
     return new Promise(async (resolve, reject) => {
-      for (const slot of player.slots) {
-        slot.factor += 5;
-      }
+      player.factorSpeed += 5;
 
       const playerRow: PlayerDTO = new PlayerEntity();
       Object.assign(playerRow, {

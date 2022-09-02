@@ -111,7 +111,9 @@ async function MorkovkoApp() {
       }
     });
 
-    client.login(config.bot.token);
+    service.slotsMigration().then(() => {
+      client.login(config.bot.token);
+    });
   } catch (error) {
     console.log(error);
   }
