@@ -78,7 +78,6 @@ export default abstract class Command {
     player.carrotCount = 0;
     player.points = 0;
     player.hasPugalo = false;
-    player.relations = [];
     player.slotsCount = 1;
     player.config = {
       autoBuyPugalo: false,
