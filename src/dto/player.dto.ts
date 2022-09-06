@@ -29,7 +29,6 @@ export interface PlayerDTO {
   lastPrayDate: Date;
   lastADate: Date;
   creationDate: Date;
-  slots: Slot[];
   hasPugalo: boolean;
   relations: Relation[];
   progressBonus: number;

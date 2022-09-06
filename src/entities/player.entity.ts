@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
-import { Slot, Relation, Config } from '../dto/player.dto';
+import { Relation, Config } from '../dto/player.dto';
 
 const config = {
   autoBuyPugalo: false,
@@ -63,9 +63,6 @@ export class PlayerEntity {
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   creationDate: Date;
-
-  @Column({ type: 'jsonb' })
-  slots: Slot[];
 
   @Column({ type: 'int4', nullable: false, default: 0 })
   slotsCount: number;

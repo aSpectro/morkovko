@@ -22,18 +22,6 @@ export class AppService {
     private playerRepository: Repository<PlayerEntity>,
   ) {}
 
-  async slotsMigration() {
-    try {
-      const data: PlayerDTO[] = await this.playerRepository.find();
-      for (const player of data) {
-        player.slotsCount = player.slots.length;
-        this.savePlayer(player);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   @Cron('0 * * * * *')
   async gameTick() {
     try {
@@ -203,7 +191,7 @@ export class AppService {
         resolve({ status: 200 });
       } catch (error) {
         resolve({ status: 400 });
-        // console.log(error);
+        console.log(error);
       }
     });
   }
