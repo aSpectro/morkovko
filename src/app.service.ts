@@ -125,6 +125,7 @@ export class AppService {
         .update()
         .set({
           dailyGiftCount: 3,
+          dailyWateringCount: 0,
         })
         .execute();
     } catch (error) {
@@ -134,6 +135,23 @@ export class AppService {
 
   setClient(client: any) {
     this.client = client;
+  }
+
+  sendPoliceReport(userId: string) {
+    const embed = new EmbedBuilder().setColor('#f5222d');
+    embed.setDescription(
+      `**В эфире криминальные новости!**\n
+      Департамент региональной безопасности и противодействия моррупции Морковного края провел спец. операцию по противодействию моррупции по добыче и сбыту морковки. В ходе операции был задержан и оштрафован <@${userId}>.\n
+      Молиция оштрафовала его на **${config.bot.economy.policeFine}** 🥕!\n
+      Граждане фермеры, наш департамент благодарит всех законопослушных граждан и желает им хорошего урожая!`,
+    );
+
+    this.client.channels
+      .fetch(mafiaChannelId)
+      .then((channel: any) => {
+        channel.send({ embeds: [embed] });
+      })
+      .catch(console.error);
   }
 
   getUsername(userId: string): Promise<{ status: number; username?: string }> {

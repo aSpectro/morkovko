@@ -5,9 +5,7 @@ import {
   getTimeFromMins,
   calcNumberWithPercentBoost,
 } from './helpers';
-import { AppService } from './../../app.service';
-
-const counts = [5, 10, 15, 20];
+import { AppService } from './../../app.service';\
 
 export class PrayCommand extends Command {
   constructor(commandName: string) {
@@ -34,6 +32,7 @@ export class PrayCommand extends Command {
           );
 
           if (diff >= needDiff) {
+            const counts = this.config.economy.pray;
             let prayCarrots = counts[Math.floor(Math.random() * counts.length)];
             prayCarrots *= player.progressBonus;
             player.lastPrayDate = moment(new Date()).toDate();

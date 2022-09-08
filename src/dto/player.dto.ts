@@ -37,6 +37,7 @@ export interface PlayerDTO {
   factorSpeed: number;
   slotsCount: number;
   stars: number;
+  dailyWateringCount: number;
 }
 
 export interface PlayerReqDTO {

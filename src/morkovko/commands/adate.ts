@@ -38,7 +38,7 @@ export class AdateCommand extends Command {
               if (successChance >= 10) isSuccess = true;
               const friend =
                 userFriends[Math.floor(Math.random() * userFriends.length)];
-              if (!isSuccess) player.carrotCount -= 1;
+              if (!isSuccess) player.carrotCount -= this.config.economy.adateFail;
 
               const rels = player.relations.find(
                 (f) => f.userId === friend.userId,
@@ -54,7 +54,7 @@ export class AdateCommand extends Command {
                 if (resSave.status === 200) {
                   service.checkUser(friend.userId).then((resFriend) => {
                     const friendModel = resFriend.player;
-                    if (!isSuccess) friendModel.carrotCount -= 1;
+                    if (!isSuccess) friendModel.carrotCount -= this.config.economy.adateFail;
                     if (resFriend.status === 200) {
                       const relsF = friendModel.relations.find(
                         (f) => f.userId === player.userId,
@@ -89,7 +89,9 @@ export class AdateCommand extends Command {
                             `Ты сходил на свидание с <@${
                               friendModel.userId
                             }>, ${
-                              !isSuccess ? 'вы потеряли по одной 🥕,' : ''
+                              !isSuccess
+                                ? `вы потеряли по ${this.config.economy.adateFail} 🥕,`
+                                : ''
                             }${!isSuccess ? noCarrot : ''} ${result} ${
                               !isSuccess ? friendNoCarrot : ''
                             }`,
