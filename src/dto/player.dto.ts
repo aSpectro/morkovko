@@ -38,6 +38,7 @@ export interface PlayerDTO {
   slotsCount: number;
   stars: number;
   dailyWateringCount: number;
+  policeReportCount: number;
 }
 
 export interface PlayerReqDTO {

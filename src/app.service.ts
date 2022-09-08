@@ -126,6 +126,7 @@ export class AppService {
         .set({
           dailyGiftCount: 3,
           dailyWateringCount: 0,
+          policeReportCount: 0,
         })
         .execute();
     } catch (error) {

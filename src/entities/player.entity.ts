@@ -47,6 +47,9 @@ export class PlayerEntity {
   dailyWateringCount: number;
 
   @Column({ type: 'int4', nullable: false, default: 0 })
+  policeReportCount: number;
+
+  @Column({ type: 'int4', nullable: false, default: 0 })
   factorSpeed: number;
 
   @Column({ type: 'boolean', nullable: false, default: false })

@@ -32,9 +32,13 @@ export class WateringCommand extends Command {
             player.config.cooldowns.watering,
           );
 
+          if (diffSeconds <= 10) {
+            player.policeReportCount += 1;
+          }
+
           if (
             diff >= needDiff &&
-            diffSeconds > 10 &&
+            player.policeReportCount > 3 &&
             player.dailyWateringCount <= 16
           ) {
             service.watering(res.player).then((resWatering) => {
