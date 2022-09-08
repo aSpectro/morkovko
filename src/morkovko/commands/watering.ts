@@ -38,7 +38,7 @@ export class WateringCommand extends Command {
 
           if (
             diff >= needDiff &&
-            player.policeReportCount > 3 &&
+            player.policeReportCount <= 3 &&
             player.dailyWateringCount <= 16
           ) {
             service.watering(res.player).then((resWatering) => {
@@ -63,21 +63,22 @@ export class WateringCommand extends Command {
                   needDiff - diff,
                 )}!`,
               );
+              this.send({
+                embeds: [setEmbedAuthor(this.embed, user)],
+              });
             } else {
               const price = this.getPrice(
                 player.slotsCount,
                 this.config.bot.economy.policeFine,
               );
               player.carrotCount -= price;
+              player.policeReportCount = 0;
               service.savePlayer(player).then((resSave) => {
                 if (resSave.status === 200) {
                   this.service.sendPoliceReport(player.userId, price);
                 }
               });
             }
-            this.send({
-              embeds: [setEmbedAuthor(this.embed, user)],
-            });
           }
         } else {
           this.replyNoUser(user);
