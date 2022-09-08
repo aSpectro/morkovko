@@ -266,6 +266,7 @@ export class AppService {
   watering(player: PlayerDTO): Promise<{ status: number }> {
     return new Promise(async (resolve, reject) => {
       player.factorSpeed += 5;
+      player.dailyWateringCount += 1;
 
       const playerRow: PlayerDTO = new PlayerEntity();
       Object.assign(playerRow, {
