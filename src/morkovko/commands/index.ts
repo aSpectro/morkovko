@@ -26,6 +26,7 @@ import { NCCommand } from './admin/nc'; // обнулить морковки
 import { NPCommand } from './admin/np'; // обнулить очки
 import { GCCommand } from './admin/gc'; // выдать морковки игроку
 import { GPCommand } from './admin/gp'; // выдать очки игроку
+import { GSCommand } from './admin/gs'; // выдать горшки игроку
 
 export default [
   new StartCommand('начать'),
@@ -56,4 +57,5 @@ export default [
   new NPCommand('np'),
   new GCCommand('gc'),
   new GPCommand('gp'),
+  new GSCommand('gs'),
 ];

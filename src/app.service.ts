@@ -342,6 +342,28 @@ export class AppService {
     });
   }
 
+  giveSlots(userId: string, count: number): Promise<{ status: number }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const player = await this.playerRepository.findOne({
+          where: { userId },
+        });
+
+        if (player) {
+          player.slotsCount += count;
+          const playerRow: PlayerDTO = player;
+          await this.playerRepository.save(playerRow);
+          resolve({ status: 200 });
+        } else {
+          resolve({ status: 400 });
+        }
+      } catch (error) {
+        resolve({ status: 400 });
+        console.log(error);
+      }
+    });
+  }
+
   givePoints(userId: string, count: number): Promise<{ status: number }> {
     return new Promise(async (resolve, reject) => {
       try {

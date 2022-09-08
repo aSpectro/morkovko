@@ -67,7 +67,7 @@ export class PlayerEntity {
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   creationDate: Date;
 
-  @Column({ type: 'int4', nullable: false, default: 0 })
+  @Column({ type: 'int4', nullable: false, default: 1 })
   slotsCount: number;
 
   @Column({ type: 'jsonb', nullable: true })
