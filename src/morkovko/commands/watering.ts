@@ -60,7 +60,12 @@ export class WateringCommand extends Command {
                 )}!`,
               );
             } else {
-              this.service.sendPoliceReport(player.userId);
+              player.carrotCount -= this.config.bot.economy.policeFine;
+              service.savePlayer(player).then((resSave) => {
+                if (resSave.status === 200) {
+                  this.service.sendPoliceReport(player.userId);
+                }
+              });
             }
             this.send({
               embeds: [setEmbedAuthor(this.embed, user)],
