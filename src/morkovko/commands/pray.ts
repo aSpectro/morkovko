@@ -32,7 +32,7 @@ export class PrayCommand extends Command {
           );
 
           if (diff >= needDiff) {
-            const counts = this.config.economy.pray;
+            const counts = this.config.bot.economy.pray;
             let prayCarrots = counts[Math.floor(Math.random() * counts.length)];
             prayCarrots *= player.progressBonus;
             player.lastPrayDate = moment(new Date()).toDate();

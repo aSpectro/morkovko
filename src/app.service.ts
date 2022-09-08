@@ -200,6 +200,7 @@ export class AppService {
       const playerRow: PlayerDTO = new PlayerEntity();
       Object.assign(playerRow, {
         ...player,
+        slotsCount: 1,
         lastPrayDate: moment(new Date()).subtract(1, 'days').toDate(),
         lastWateringDate: moment(new Date()).subtract(1, 'hours').toDate(),
       });
