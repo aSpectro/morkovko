@@ -26,7 +26,7 @@ export class WateringCommand extends Command {
           const d1 = moment(player.lastWateringDate);
           const d2 = moment(new Date());
           const diff = d2.diff(d1, 'minutes');
-          const diffSeconds = d2.diff(d1, 'seconds');
+          const diffSeconds = Math.abs(d1.seconds() - d2.seconds());
           const needDiff = calcNumberWithPercentBoost(
             60,
             player.config.cooldowns.watering,
