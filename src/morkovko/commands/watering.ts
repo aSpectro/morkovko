@@ -60,10 +60,14 @@ export class WateringCommand extends Command {
                 )}!`,
               );
             } else {
-              player.carrotCount -= this.config.bot.economy.policeFine;
+              const price = this.getPrice(
+                player.slotsCount,
+                this.config.bot.economy.policeFine,
+              );
+              player.carrotCount -= price;
               service.savePlayer(player).then((resSave) => {
                 if (resSave.status === 200) {
-                  this.service.sendPoliceReport(player.userId);
+                  this.service.sendPoliceReport(player.userId, price);
                 }
               });
             }
