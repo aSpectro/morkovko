@@ -5,7 +5,7 @@ import {
   getTimeFromMins,
   calcNumberWithPercentBoost,
 } from './helpers';
-import { AppService } from './../../app.service';\
+import { AppService } from './../../app.service';
 
 export class PrayCommand extends Command {
   constructor(commandName: string) {
