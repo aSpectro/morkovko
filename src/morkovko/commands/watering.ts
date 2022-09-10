@@ -26,21 +26,12 @@ export class WateringCommand extends Command {
           const d1 = moment(player.lastWateringDate);
           const d2 = moment(new Date());
           const diff = d2.diff(d1, 'minutes');
-          const diffSeconds = Math.abs(d1.seconds() - d2.seconds());
           const needDiff = calcNumberWithPercentBoost(
             60,
             player.config.cooldowns.watering,
           );
 
-          if (diffSeconds <= 10 && diff >= needDiff) {
-            player.policeReportCount += 1;
-          }
-
-          if (
-            diff >= needDiff &&
-            player.policeReportCount <= 3 &&
-            player.dailyWateringCount <= 16
-          ) {
+          if (diff >= needDiff) {
             service.watering(res.player).then((resWatering) => {
               if (resWatering.status === 200) {
                 this.embed.setDescription(`Морковка полита!`);
@@ -57,28 +48,14 @@ export class WateringCommand extends Command {
               }
             });
           } else {
-            if (diff < needDiff) {
-              this.embed.setDescription(
-                `Ты сможешь полить морковку не раньше чем через ${getTimeFromMins(
-                  needDiff - diff,
-                )}!`,
-              );
-              this.send({
-                embeds: [setEmbedAuthor(this.embed, user)],
-              });
-            } else {
-              const price = this.getPrice(
-                player.slotsCount,
-                this.config.bot.economy.policeFine,
-              );
-              player.carrotCount -= price;
-              player.policeReportCount = 0;
-              service.savePlayer(player).then((resSave) => {
-                if (resSave.status === 200) {
-                  this.service.sendPoliceReport(player.userId, price);
-                }
-              });
-            }
+            this.embed.setDescription(
+              `Ты сможешь полить морковку не раньше чем через ${getTimeFromMins(
+                needDiff - diff,
+              )}!`,
+            );
+            this.send({
+              embeds: [setEmbedAuthor(this.embed, user)],
+            });
           }
         } else {
           this.replyNoUser(user);

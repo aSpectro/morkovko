@@ -71,6 +71,12 @@ class ConfigService {
       database: this.getValue('POSTGRES_DATABASE'),
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
+      // migrations: ['dist/migrations/*.{ts,js}'],
+      // migrationsTableName: 'typeorm_migrations',
+      // migrationsRun: true,
+      // cli: {
+      //   migrationsDir: 'src/migrations',
+      // },
     };
   }
 }

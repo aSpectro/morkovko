@@ -1,4 +1,3 @@
-import { performance } from 'node:perf_hooks';
 import { Injectable } from '@nestjs/common';
 import { configService } from './config/config.service';
 import { Cron } from '@nestjs/schedule';
@@ -8,9 +7,13 @@ import { calcProgress, calcPrice } from './morkovko/commands/helpers';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { PlayerEntity } from './entities/player.entity';
+import { LogEntity } from './entities/log.entity';
+import { ReportEntity } from './entities/report.entity';
 import { PlayerDTO, PlayerReqDTO } from './dto/player.dto';
+import { LogDTO } from './dto/log.dto';
+import { ReportDTO } from './dto/report.dto';
 
 const mafiaChannelId = configService.getMorkovkoChannel();
 
@@ -20,6 +23,12 @@ export class AppService {
   constructor(
     @InjectRepository(PlayerEntity)
     private playerRepository: Repository<PlayerEntity>,
+
+    @InjectRepository(LogEntity)
+    private logRepository: Repository<LogEntity>,
+
+    @InjectRepository(ReportEntity)
+    private reportRepository: Repository<ReportEntity>,
   ) {}
 
   @Cron('0 * * * * *')
@@ -134,25 +143,120 @@ export class AppService {
     }
   }
 
+  /**
+   * Kassio AC Native v.1.0.1
+   * reports reaper
+   */
+  @Cron('0 */5 * * * *')
+  async kassioAC() {
+    try {
+      // fetch all users
+      const players: PlayerEntity[] = await this.playerRepository.find();
+      for (const player of players) {
+        const { userId } = player;
+        // get last 2 hours logs
+        const excludes = [
+          'скорость-роста',
+          'кулдаун-свидание',
+          'кулдаун-полив',
+          'кулдаун-молитва',
+        ];
+        const logs = (
+          await this.logRepository.find({
+            where: {
+              userId: userId,
+              reported: false,
+              executeDate: MoreThan(
+                moment(new Date()).subtract(2, 'hours').toDate(),
+              ),
+            },
+          })
+        ).filter((f) => excludes.indexOf(f.commandName) === -1);
+
+        // order logs commands
+        const logsOrderCommands: { [key: string]: LogDTO[] } = {};
+        logs.forEach((log) => {
+          if (logsOrderCommands[log.commandName]) {
+            logsOrderCommands[log.commandName].push(log);
+          } else {
+            logsOrderCommands[log.commandName] = [log];
+          }
+        });
+
+        // check commands regularity
+        Object.entries(logsOrderCommands).forEach(async (command) => {
+          const minutes = [];
+          command[1].forEach((log) => {
+            const m = moment(log.executeDate).minutes();
+            minutes.push(m);
+          });
+          const repeats: { [key: string]: number } = {};
+          minutes.forEach((x) => {
+            repeats[x] = (repeats[x] || 0) + 1;
+          });
+          let maxRepeats = 0;
+          Object.entries(repeats).forEach((r) => {
+            if (r[1] > maxRepeats) maxRepeats = r[1];
+          });
+
+          if (maxRepeats >= 18) {
+            const userReports = await this.reportRepository.find({
+              where: {
+                userId: userId,
+              },
+            });
+            const reportsCount =
+              userReports.length > 0 ? userReports.length : 1;
+            const ePrice = config.bot.economy.policeFine;
+            const price =
+              Math.round((player.slotsCount / 50) * ePrice + ePrice) *
+              reportsCount;
+            player.carrotCount -= price;
+            this.savePlayer(player).then((res) => {
+              if (res.status === 200) {
+                this.sendPoliceReport(userId, price, logsOrderCommands);
+                command[1].forEach(async (log) => {
+                  log.reported = true;
+                  await this.logRepository.save(log);
+                });
+              }
+            });
+          }
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   setClient(client: any) {
     this.client = client;
   }
 
-  sendPoliceReport(userId: string, price) {
-    const embed = new EmbedBuilder().setColor('#f5222d');
-    embed.setDescription(
-      `**В эфире криминальные новости!**\n
-      Департамент региональной безопасности и противодействия моррупции Морковного края провел спец. операцию по противодействию моррупции по добыче и сбыту морковки. В ходе операции был задержан и оштрафован <@${userId}>.\n
-      Молиция оштрафовала его на **${price}** 🥕!\n
-      Граждане фермеры, наш департамент благодарит всех законопослушных граждан и желает им хорошего урожая!`,
-    );
+  sendPoliceReport(userId: string, price, logs: { [key: string]: LogDTO[] }) {
+    const report: ReportDTO = {
+      userId,
+      fineCount: price,
+      commandsLogs: logs,
+    };
+    this.report(report).then((res) => {
+      if (res.status === 200) {
+        const embed = new EmbedBuilder().setColor('#f5222d');
+        embed.setDescription(
+          `**В эфире криминальные новости!**\n
+          Департамент региональной безопасности и противодействия моррупции Морковного края провел спец. операцию по противодействию моррупции по добыче и сбыту морковки. В ходе операции был задержан и оштрафован <@${userId}>.\n
+          Молиция оштрафовала его на **${price}** 🥕!\n
+          Граждане фермеры, наш департамент благодарит всех законопослушных граждан и желает им хорошего урожая!`,
+        );
 
-    this.client.channels
-      .fetch(mafiaChannelId)
-      .then((channel: any) => {
-        channel.send({ embeds: [embed] });
-      })
-      .catch(console.error);
+        this.client.channels
+          .fetch(mafiaChannelId)
+          .then((channel: any) => {
+            channel.send({ embeds: [embed] });
+          })
+          .catch(console.error);
+      }
+    });
   }
 
   getUsername(userId: string): Promise<{ status: number; username?: string }> {
@@ -207,11 +311,13 @@ export class AppService {
       });
 
       try {
-        await this.playerRepository.save(playerRow);
+        await this.playerRepository.save(
+          this.playerRepository.create(playerRow),
+        );
         resolve({ status: 200 });
       } catch (error) {
         resolve({ status: 400 });
-        console.log(error);
+        // console.log(error);
       }
     });
   }
@@ -381,6 +487,38 @@ export class AppService {
         } else {
           resolve({ status: 400 });
         }
+      } catch (error) {
+        resolve({ status: 400 });
+        console.log(error);
+      }
+    });
+  }
+
+  log(log: LogDTO): Promise<{ status: number }> {
+    return new Promise(async (resolve, reject) => {
+      const logRow: LogDTO = new LogEntity();
+      Object.assign(logRow, {
+        ...log,
+      });
+      try {
+        await this.logRepository.save(this.logRepository.create(logRow));
+        resolve({ status: 200 });
+      } catch (error) {
+        resolve({ status: 400 });
+        console.log(error);
+      }
+    });
+  }
+
+  report(report: ReportDTO): Promise<{ status: number }> {
+    return new Promise(async (resolve, reject) => {
+      const reportRow: ReportDTO = new ReportEntity();
+      Object.assign(reportRow, report);
+      try {
+        await this.reportRepository.save(
+          this.reportRepository.create(reportRow),
+        );
+        resolve({ status: 200 });
       } catch (error) {
         resolve({ status: 400 });
         console.log(error);

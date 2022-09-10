@@ -2,6 +2,7 @@ import { EmbedBuilder, ColorResolvable } from 'discord.js';
 import { noUserEmbed, randomIntFromInterval } from './helpers';
 import config from '../config';
 import { AppService } from './../../app.service';
+import { LogDTO } from '../../dto/log.dto';
 
 export default abstract class Command {
   public commandName: string;
@@ -27,7 +28,7 @@ export default abstract class Command {
       await this.message.channel.send(messageData).catch(() => console.log(''));
   }
 
-  public initCommand(
+  public async initCommand(
     message: any,
     args: any,
     service: AppService,
@@ -42,7 +43,23 @@ export default abstract class Command {
       config.bot.badgeColor as ColorResolvable,
     );
 
-    return callBack();
+    const mention = this.getArgUser('игрок')
+    const count = this.getArgString('кол-во')
+
+    const logData: LogDTO = {
+      userId: this.getUser().id,
+      commandName: this.name,
+      arguments: {}
+    }
+
+    if (mention) logData.arguments.mention = mention;
+    if (count) logData.arguments.count = count;
+    const log = await this.service.log(logData);
+
+    if (log.status === 200) {
+      return callBack();
+    }
+    return;
   }
 
   public getUser() {

@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  Unique,
 } from 'typeorm';
 
 import { Relation, Config } from '../dto/player.dto';
@@ -18,6 +19,7 @@ const config = {
 };
 
 @Entity()
+@Unique('unique_user', ['userId'])
 export class PlayerEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;

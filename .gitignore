@@ -27,6 +27,7 @@ lerna-debug.log*
 .settings/
 *.sublime-workspace
 .env
+*.sql
 /outputs
 start-db.sh
 
