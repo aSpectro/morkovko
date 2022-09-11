@@ -167,7 +167,7 @@ export class AppService {
               userId: userId,
               reported: false,
               executeDate: MoreThan(
-                moment(new Date()).subtract(19, 'hours').toDate(),
+                moment(new Date()).subtract(1, 'days').toDate(),
               ),
             },
           })
