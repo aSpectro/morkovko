@@ -67,7 +67,12 @@ export class ShopCommand extends Command {
 
           if (
             player.carrotSize >=
-            this.config.bot.economy.shopRules.slotSpeedUpdate
+              this.config.bot.economy.shopRules.slotSpeedUpdate &&
+            this.canBuy(
+              player.carrotSize,
+              'slotSpeedUpdate',
+              player.config.slotSpeedUpdate,
+            )
           ) {
             this.embed.addFields({
               name: '!скорость-роста',
@@ -80,7 +85,9 @@ export class ShopCommand extends Command {
           }
 
           if (
-            player.carrotSize >= this.config.bot.economy.shopRules.autoBuyPugalo
+            player.carrotSize >=
+              this.config.bot.economy.shopRules.autoBuyPugalo &&
+            this.canBuy(player.carrotSize, 'autoBuyPugalo', 1)
           ) {
             this.embed.addFields({
               name: '!автопокупка-пугала',
