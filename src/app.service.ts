@@ -154,7 +154,7 @@ export class AppService {
       const players: PlayerEntity[] = await this.playerRepository.find();
       for (const player of players) {
         const { userId } = player;
-        // get last 2 hours logs
+        // get last day logs
         const excludes = [
           'скорость-роста',
           'кулдаун-свидание',
@@ -171,6 +171,7 @@ export class AppService {
           'игрок',
           'ping',
           'топ',
+          'увеличить',
         ];
         const logs = (
           await this.logRepository.find({
