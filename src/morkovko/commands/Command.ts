@@ -117,7 +117,10 @@ export default abstract class Command {
     return currentProgress * 30 + 100;
   }
 
-  public canBuy(carrotSize, key) {
+  public canBuy(carrotSize, key, boostCount) {
+    if (boostCount >= 50) {
+      return false;
+    }
     if (carrotSize >= this.config.bot.economy.shopRules[key]) {
       return true;
     }

@@ -105,11 +105,11 @@ export function calcProgress(
   const factor = factorSpeed === 0 ? 1 : factorSpeed;
   let progress = slots;
   progress += (progress / 100) * pBonus;
-  progress += (progress / 100) * speedBonus;
+  progress += (progress / 100) * (speedBonus > 50 ? 50 : speedBonus);
   progress += (progress / 100) * factor;
   return Math.floor(progress);
 }
 
 export function calcNumberWithPercentBoost(number, boost) {
-  return number - (number / 100) * boost;
+  return number - (number / 100) * (boost > 50 ? 50 : boost);
 }

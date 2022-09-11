@@ -20,7 +20,7 @@ export class CWCommand extends Command {
         if (res.status === 200 && res.player) {
           const player = res.player;
           const price = this.getPrice(player.slotsCount, cooldowns.watering);
-          if (player.points >= price && this.canBuy(player.carrotSize, 'cooldowns')) {
+          if (player.points >= price && this.canBuy(player.carrotSize, 'cooldowns', player.config.cooldowns.watering)) {
             player.config.cooldowns.watering += 1;
             player.points -= price;
             service.savePlayer(player).then((resSave) => {
@@ -41,9 +41,9 @@ export class CWCommand extends Command {
               }
             });
           } else {
-            if (!this.canBuy(player.carrotSize, 'cooldowns')) {
+            if (!this.canBuy(player.carrotSize, 'cooldowns', player.config.cooldowns.watering)) {
               this.embed.setDescription(
-                `Ты не можешь купить этот бонус, твоя морковка слишком маленькая!`,
+                `Ты не можешь купить этот бонус!`,
               );
             } else {
               this.embed.setDescription(

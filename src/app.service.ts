@@ -199,7 +199,7 @@ export class AppService {
             if (r[1] > maxRepeats) maxRepeats = r[1];
           });
 
-          if (maxRepeats >= 18) {
+          if (maxRepeats >= 10) {
             const userReports = await this.reportRepository.find({
               where: {
                 userId: userId,

@@ -21,7 +21,7 @@ export class GRCommand extends Command {
         if (res.status === 200 && res.player) {
           const player = res.player;
           const price = this.getPrice(player.slotsCount, slotSpeedUpdate);
-          if (player.points >= price && this.canBuy(player.carrotSize, 'slotSpeedUpdate')) {
+          if (player.points >= price && this.canBuy(player.carrotSize, 'slotSpeedUpdate', player.config.slotSpeedUpdate)) {
             player.config.slotSpeedUpdate += 1;
             player.points -= price;
             service.savePlayer(player).then((resSave) => {
@@ -42,9 +42,9 @@ export class GRCommand extends Command {
               }
             });
           } else {
-            if (!this.canBuy(player.carrotSize, 'slotSpeedUpdate')) {
+            if (!this.canBuy(player.carrotSize, 'slotSpeedUpdate', player.config.slotSpeedUpdate)) {
               this.embed.setDescription(
-                `Ты не можешь купить этот бонус, твоя морковка слишком маленькая!`,
+                `Ты не можешь купить этот бонус!`,
               );
             } else {
               this.embed.setDescription(
