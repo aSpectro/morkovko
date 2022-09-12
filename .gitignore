@@ -30,6 +30,7 @@ lerna-debug.log*
 *.sql
 /outputs
 start-db.sh
+start-redis.sh
 
 # IDE - VSCode
 .vscode/*

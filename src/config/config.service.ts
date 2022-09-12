@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { RedisModuleOptions } from 'nestjs-redis';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -77,6 +78,15 @@ class ConfigService {
       // cli: {
       //   migrationsDir: 'src/migrations',
       // },
+    };
+  }
+
+  public getRedisConfig(): RedisModuleOptions {
+    return {
+      host: this.getValue('REDIS_HOST'),
+      port: parseInt(this.getValue('REDIS_PORT')),
+      db: parseInt(this.getValue('REDIS_DATABASE')),
+      password: this.getValue('REDIS_PASSWORD'),
     };
   }
 }

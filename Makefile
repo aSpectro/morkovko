@@ -10,6 +10,9 @@ commit:
 dev: install
 	yarn start:dev
 
+redis:
+	yarn redis
+
 build: install
 	yarn build
 
@@ -17,4 +20,4 @@ prod: build
 	yarn start:prod
 
 db:
-	yarn start:dev:db
+	yarn db

@@ -11,6 +11,8 @@ import { AppService } from './app.service';
 import { AppModule } from './app.module';
 import { NFTService } from './nft/nft.service';
 import { NFTModule } from './nft/nft.module';
+import { QuizService } from './quiz/quiz.service';
+import { QuizModule } from './quiz/quiz.module';
 
 import config from './morkovko/config';
 import { configService } from './config/config.service';
@@ -35,6 +37,11 @@ async function MorkovkoApp() {
   const app = await NestFactory.create(AppModule);
   await app.listen(configService.getPort());
   const service = app.get<AppService>(AppService);
+  const quiz = await NestFactory.create(QuizModule);
+  await quiz.listen(parseInt(configService.getPort()) + 1);
+  const quizService = quiz.get<QuizService>(QuizService);
+  await quizService.loadQuestions();
+
   registerSlashCommands(
     config.bot.clientId,
     config.bot.guildId,
@@ -61,10 +68,15 @@ async function MorkovkoApp() {
         });
       }, 300000);
       service.setClient(client);
+      quizService.setClient(client);
+      quizService.setRedisClient();
       console.log('Morkovko bot ready!');
     });
 
     client.on('interactionCreate', async (interaction) => {
+      if (interaction.isButton()) {
+        await quizService.processAnswer(interaction);
+      }
       if (
         !interaction.isChatInputCommand() ||
         (configService.isProduction() &&
@@ -72,6 +84,7 @@ async function MorkovkoApp() {
         !configService.isProduction()
       )
         return;
+
       const commandController = client.commands.get(interaction.commandName);
       const args = interaction.options;
       if (commandController) {
