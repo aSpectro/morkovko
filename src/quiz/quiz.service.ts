@@ -51,7 +51,7 @@ export class QuizService {
     await this.redis.flushall('ASYNC');
   }
 
-  @Cron('10 */5 * * * *')
+  @Cron('10 * 16 * * *')
   async startPlayQuiz() {
     try {
       const fund: FundDTO = await this.fundRepository.findOne({
