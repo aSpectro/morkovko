@@ -16,7 +16,7 @@ export class SellCommand extends Command {
     this.initCommand(message, args, service, isSlash, () => {
       const user = this.getUser();
 
-      service.checkUser(user.id).then((res) => {
+      service.checkUser(user.id).then(async (res) => {
         if (res.status === 200) {
           const player = res.player;
           const grabChance = getChance();
@@ -31,6 +31,14 @@ export class SellCommand extends Command {
             player.points += grab
               ? count - (grabCount === 0 ? 1 : grabCount)
               : count;
+
+            const fundRes = await service.getActiveFund();
+            if (fundRes.status === 200) {
+              const fund = fundRes.fund;
+              fund.fundSize += grabCount === 0 ? 1 : grabCount;
+              await service.saveFund(fund);
+            }
+
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 if (grab) {

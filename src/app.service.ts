@@ -10,9 +10,11 @@ import * as moment from 'moment';
 import { MoreThan, Repository } from 'typeorm';
 import { PlayerEntity } from './entities/player.entity';
 import { LogEntity } from './entities/log.entity';
+import { FundEntity } from './entities/fund.entity';
 import { ReportEntity } from './entities/report.entity';
 import { PlayerDTO, PlayerReqDTO } from './dto/player.dto';
 import { LogDTO } from './dto/log.dto';
+import { FundDTO } from './dto/fund.dto';
 import { ReportDTO } from './dto/report.dto';
 
 const mafiaChannelId = configService.getMorkovkoChannel();
@@ -29,6 +31,9 @@ export class AppService {
 
     @InjectRepository(ReportEntity)
     private reportRepository: Repository<ReportEntity>,
+
+    @InjectRepository(FundEntity)
+    private fundRepository: Repository<FundEntity>,
   ) {}
 
   @Cron('0 * * * * *')
@@ -251,8 +256,14 @@ export class AppService {
       fineCount: price,
       commandsLogs: logs,
     };
-    this.report(report).then((res) => {
+    this.report(report).then(async (res) => {
       if (res.status === 200) {
+        const fundRes = await this.getActiveFund();
+        if (fundRes.status === 200) {
+          const fund = fundRes.fund;
+          fund.fundSize += price;
+          await this.saveFund(fund);
+        }
         const embed = new EmbedBuilder().setColor('#f5222d');
         embed.setDescription(
           `**В эфире криминальные новости!**\n
@@ -530,6 +541,39 @@ export class AppService {
         await this.reportRepository.save(
           this.reportRepository.create(reportRow),
         );
+        resolve({ status: 200 });
+      } catch (error) {
+        resolve({ status: 400 });
+        console.log(error);
+      }
+    });
+  }
+
+  getActiveFund(): Promise<{ status: number; fund?: FundDTO }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const fund: FundDTO = await this.fundRepository.findOne({
+          where: {
+            isActive: true,
+          },
+        });
+
+        if (fund) {
+          resolve({ status: 200, fund });
+        } else {
+          resolve({ status: 400 });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+
+  saveFund(fund: FundDTO): Promise<{ status: number }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const fundRow: FundDTO = fund;
+        await this.fundRepository.save(fundRow);
         resolve({ status: 200 });
       } catch (error) {
         resolve({ status: 400 });

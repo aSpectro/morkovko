@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { configService } from './../config/config.service';
 import { Cron } from '@nestjs/schedule';
-import config from './../morkovko/config';
 import {
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,7 +9,7 @@ import {
   ButtonStyle,
 } from 'discord.js';
 import { RedisService } from 'nestjs-redis';
-import { calcProgress, calcPrice } from './../morkovko/commands/helpers';
+import { setEmbedAuthor, capitalize } from './../morkovko/commands/helpers';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -27,7 +26,9 @@ const mafiaChannelId = configService.getMorkovkoChannel();
 export class QuizService {
   client: any;
   redis: any;
+  cooldown = new Set();
   currentQuestion: any;
+  currentQuiz: { users: { id: string; points: number }[]; carrots: number };
   constructor(
     @InjectRepository(PlayerEntity)
     private playerRepository: Repository<PlayerEntity>,
@@ -47,9 +48,10 @@ export class QuizService {
 
   async setRedisClient() {
     this.redis = await this.redisService.getClient();
+    await this.redis.flushall('ASYNC');
   }
 
-  @Cron('10 * * * * *')
+  @Cron('10 */5 * * * *')
   async startPlayQuiz() {
     try {
       const fund: FundDTO = await this.fundRepository.findOne({
@@ -57,10 +59,6 @@ export class QuizService {
           isActive: true,
         },
       });
-
-      // await this.redis.set('test', '123');
-      // await this.redis.del('test');
-      // console.log(await this.redis.get('test'));
 
       if (fund) {
         const embed = new EmbedBuilder().setColor('#2f54eb');
@@ -74,6 +72,11 @@ export class QuizService {
           4. По истечению вопросов, игрок, набравший больше всех баллов получает морковки из призового фонда.\n
           5. Если в конце игры игроки с большим числом баллов имеют равно кол-во баллов, то призовой фонд делиться между ними поровну.`,
         );
+
+        this.currentQuiz = {
+          users: [],
+          carrots: fund.fundSize,
+        };
 
         this.client.channels
           .fetch(mafiaChannelId)
@@ -90,7 +93,7 @@ export class QuizService {
     }
   }
 
-  @Cron('0 * * * * *')
+  @Cron('0 * 2 * * *')
   async fundRotator() {
     try {
       const fund: FundDTO = await this.fundRepository.findOne({
@@ -132,14 +135,14 @@ export class QuizService {
       },
     });
 
-    const send = async (data) => {
+    const send = async (data, id) => {
       const embed = new EmbedBuilder().setColor('#2f54eb');
       embed.setDescription(
         `**Вопрос викторины**\n
         ❓ ${data.label}`,
       );
+      embed.setFooter({ text: `${id}/10` });
 
-      console.log(data);
       const values = data.values.sort(() => 0.5 - Math.random());
       const row = new ActionRowBuilder();
       const fund: FundDTO = await this.fundRepository.findOne({
@@ -155,7 +158,7 @@ export class QuizService {
               .setCustomId(
                 `${fund.id}:${v.isRight ? 'right' : 'wrong'}:${v.id}`,
               )
-              .setLabel(`${v.label}`)
+              .setLabel(`${capitalize(v.label)}`)
               .setStyle(ButtonStyle.Primary),
           );
         });
@@ -173,10 +176,10 @@ export class QuizService {
       q.isUsed = true;
       await this.quizRepository.save(q);
       if (this.currentQuestion) {
-        if (this.currentQuestion < 10) {
+        if (this.currentQuestion.id < 10) {
           this.currentQuestion.id += 1;
           this.currentQuestion.qData = q;
-          send(q.questionData);
+          send(q.questionData, this.currentQuestion.id);
         } else {
           await this.calcWinners();
         }
@@ -185,7 +188,7 @@ export class QuizService {
           id: 1,
           qData: q,
         };
-        send(q.questionData);
+        send(q.questionData, this.currentQuestion.id);
       }
     } else {
       await this.quizRepository
@@ -201,18 +204,127 @@ export class QuizService {
   }
 
   async calcWinners() {
-    //
+    const a = this.currentQuiz;
+    const maxPoints = Math.max(...a.users.map((m) => m.points));
+    const embed = new EmbedBuilder().setColor('#52c41a');
+    if (maxPoints === 0) {
+      embed.setDescription(`К сожалению никто не выиграл в викторине.`);
+    } else {
+      const winners = a.users.filter((f) => f.points === maxPoints);
+      const prize =
+        winners.length > 1 ? Math.floor(a.carrots / winners.length) : a.carrots;
+
+      if (winners.length > 1) {
+        const winnersMention = winners.map((m) => `<@${m.id}>`).join(' ');
+        embed.setDescription(
+          `**Встречайте победителей викторины!**\n
+          🏆 ${winnersMention} набрали больше всех баллов - **${maxPoints}**!\n
+          Их приз: **${prize.toLocaleString()}** 🥕 каждому!`,
+        );
+      } else {
+        embed.setDescription(
+          `**Встречайте победителя викторины!**\n
+          🏆 <@${winners[0].id}> набрал больше всех баллов - **${maxPoints}**!\n
+          Его приз: **${prize.toLocaleString()}** 🥕!`,
+        );
+      }
+
+      winners.forEach(async (w) => {
+        try {
+          const player: PlayerDTO = await this.playerRepository.findOne({
+            where: {
+              userId: w.id,
+            },
+          });
+          if (player) {
+            player.carrotCount += prize;
+            await this.savePlayer(player);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    }
+    this.client.channels
+      .fetch(mafiaChannelId)
+      .then(async (channel: any) => {
+        channel.send({ embeds: [embed] });
+        const fundRes = await this.getActiveFund();
+        if (fundRes.status === 200) {
+          const fund = fundRes.fund;
+          fund.isActive = false;
+          await this.saveFund(fund);
+        }
+      })
+      .catch(console.error);
   }
 
   async processAnswer(interaction: any) {
-    console.log(interaction.customId);
-    console.log(interaction.user.id);
+    const user = interaction.user;
+    const [funId, value, valueId] = interaction.customId.split(':');
+    const fund = await this.fundRepository.findOne({
+      where: {
+        id: funId,
+      },
+    });
 
-    if (interaction.customId === 'primary') {
+    // if (this.cooldown.has(user.id)) {
+    //   const embed = new EmbedBuilder().setColor('#f5222d');
+    //   embed.setDescription(`Подожди пару секунд, ты уже отвечал!`);
+    //   await interaction.reply({
+    //     embeds: [setEmbedAuthor(embed, user)],
+    //     ephemeral: true,
+    //   });
+    // }
+
+    // // set delay
+    // this.cooldown.add(user.id);
+    // // setTimeout(() => {
+    // //   this.cooldown.delete(user.id);
+    // // }, 3000);
+
+    if (!fund || (fund && !fund.isActive)) {
+      const embed = new EmbedBuilder().setColor('#f5222d');
+      embed.setDescription(`Эта викторина уже закончилась!`);
       await interaction.update({
-        content: 'Приключения закончились..',
-        embeds: [],
+        embeds: [embed],
         components: [],
+      });
+    }
+
+    if (value === 'right') {
+      const rightValue = this.currentQuestion.qData.questionData.values.find(
+        (f) => f.isRight,
+      ).label;
+      const embed = new EmbedBuilder().setColor('#2f54eb');
+      embed.setDescription(
+        `❓ ${this.currentQuestion.qData.questionData.label}\n
+        <@${user.id}> ответил верно! Правильный ответ: **${capitalize(
+          rightValue,
+        )}**`,
+      );
+
+      const cqUser = this.currentQuiz.users.find((f) => f.id === user.id);
+      if (cqUser) {
+        cqUser.points += 1;
+      } else {
+        this.currentQuiz.users.push({ id: user.id, points: 1 });
+      }
+
+      await interaction.update({
+        embeds: [embed],
+        components: [],
+      });
+
+      setTimeout(async () => {
+        await this.sendQuestion();
+      }, 10000);
+    } else {
+      const embed = new EmbedBuilder().setColor('#f5222d');
+      embed.setDescription(`Неверно, попробуй другой вариант!`);
+      await interaction.reply({
+        embeds: [setEmbedAuthor(embed, user)],
+        ephemeral: true,
       });
     }
   }
@@ -267,6 +379,7 @@ export class QuizService {
             .filter(
               (f) => !f.label || f.values.filter((v) => !v.label).length < 4,
             )
+            .sort(() => 0.5 - Math.random())
             .map((m) => {
               m.values = m.values.map((v) => {
                 v.id = idNum;
@@ -297,5 +410,51 @@ export class QuizService {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  savePlayer(player: PlayerDTO): Promise<{ status: number }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const playerRow: PlayerDTO = player;
+        await this.playerRepository.save(playerRow);
+        resolve({ status: 200 });
+      } catch (error) {
+        resolve({ status: 400 });
+        console.log(error);
+      }
+    });
+  }
+
+  getActiveFund(): Promise<{ status: number; fund?: FundDTO }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const fund: FundDTO = await this.fundRepository.findOne({
+          where: {
+            isActive: true,
+          },
+        });
+
+        if (fund) {
+          resolve({ status: 200, fund });
+        } else {
+          resolve({ status: 400 });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+
+  saveFund(fund: FundDTO): Promise<{ status: number }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const fundRow: FundDTO = fund;
+        await this.fundRepository.save(fundRow);
+        resolve({ status: 200 });
+      } catch (error) {
+        resolve({ status: 400 });
+        console.log(error);
+      }
+    });
   }
 }

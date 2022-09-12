@@ -113,3 +113,7 @@ export function calcProgress(
 export function calcNumberWithPercentBoost(number, boost) {
   return number - (number / 100) * (boost > 50 ? 50 : boost);
 }
+
+export function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
