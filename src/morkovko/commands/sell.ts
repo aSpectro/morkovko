@@ -33,7 +33,7 @@ export class SellCommand extends Command {
               : count;
 
             const fundRes = await service.getActiveFund();
-            if (fundRes.status === 200) {
+            if (fundRes.status === 200 && grab) {
               const fund = fundRes.fund;
               fund.fundSize += grabCount === 0 ? 1 : grabCount;
               await service.saveFund(fund);

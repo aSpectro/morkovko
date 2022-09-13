@@ -1,6 +1,6 @@
 {
   "name": "morkovko",
-  "version": "0.2.37",
+  "version": "0.2.38",
   "description": "Discord бот - Nest.js, PostgreSQL, Discord.js",
   "author": "aSpectro",
   "private": true,
