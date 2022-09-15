@@ -178,6 +178,7 @@ export class QuizService {
       if (this.currentQuestion) {
         if (this.currentQuestion.id < 10) {
           this.currentQuestion.id += 1;
+          this.currentQuestion.isActive = true;
           this.currentQuestion.qData = q;
           send(q.questionData, this.currentQuestion.id);
         } else {
@@ -186,6 +187,7 @@ export class QuizService {
       } else {
         this.currentQuestion = {
           id: 1,
+          isActive: true,
           qData: q,
         };
         send(q.questionData, this.currentQuestion.id);
@@ -228,6 +230,8 @@ export class QuizService {
           Его приз: **${prize.toLocaleString()}** 🥕!`,
         );
       }
+
+      this.currentQuestion = null;
 
       winners.forEach(async (w) => {
         try {
@@ -292,7 +296,7 @@ export class QuizService {
       });
     }
 
-    if (value === 'right') {
+    if (value === 'right' && this.currentQuestion.isActive) {
       const rightValue = this.currentQuestion.qData.questionData.values.find(
         (f) => f.isRight,
       ).label;
@@ -316,6 +320,7 @@ export class QuizService {
         components: [],
       });
 
+      this.currentQuestion.isActive = false;
       setTimeout(async () => {
         await this.sendQuestion();
       }, 10000);
