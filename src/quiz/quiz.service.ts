@@ -272,65 +272,72 @@ export class QuizService {
       },
     });
 
-    // if (this.cooldown.has(user.id)) {
-    //   const embed = new EmbedBuilder().setColor('#f5222d');
-    //   embed.setDescription(`Подожди пару секунд, ты уже отвечал!`);
-    //   await interaction.reply({
-    //     embeds: [setEmbedAuthor(embed, user)],
-    //     ephemeral: true,
-    //   });
-    // }
-
-    // // set delay
-    // this.cooldown.add(user.id);
-    // // setTimeout(() => {
-    // //   this.cooldown.delete(user.id);
-    // // }, 3000);
-
+    const setDelay = () => {
+      this.cooldown.add(user.id);
+      setTimeout(() => {
+        this.cooldown.delete(user.id);
+      }, 3000);
+    };
     if (!fund || (fund && !fund.isActive)) {
       const embed = new EmbedBuilder().setColor('#f5222d');
       embed.setDescription(`Эта викторина уже закончилась!`);
-      await interaction.update({
-        embeds: [embed],
-        components: [],
-      });
-    }
-
-    if (value === 'right' && this.currentQuestion.isActive) {
-      const rightValue = this.currentQuestion.qData.questionData.values.find(
-        (f) => f.isRight,
-      ).label;
-      const embed = new EmbedBuilder().setColor('#2f54eb');
-      embed.setDescription(
-        `❓ ${this.currentQuestion.qData.questionData.label}\n
-        <@${user.id}> ответил верно! Правильный ответ: **${capitalize(
-          rightValue,
-        )}**`,
-      );
-
-      const cqUser = this.currentQuiz.users.find((f) => f.id === user.id);
-      if (cqUser) {
-        cqUser.points += 1;
-      } else {
-        this.currentQuiz.users.push({ id: user.id, points: 1 });
-      }
-
-      await interaction.update({
-        embeds: [embed],
-        components: [],
-      });
-
-      this.currentQuestion.isActive = false;
-      setTimeout(async () => {
-        await this.sendQuestion();
-      }, 10000);
+      await interaction
+        .update({
+          embeds: [embed],
+          components: [],
+        })
+        .catch();
     } else {
-      const embed = new EmbedBuilder().setColor('#f5222d');
-      embed.setDescription(`Неверно, попробуй другой вариант!`);
-      await interaction.reply({
-        embeds: [setEmbedAuthor(embed, user)],
-        ephemeral: true,
-      });
+      if (this.cooldown.has(user.id)) {
+        const embed = new EmbedBuilder().setColor('#f5222d');
+        embed.setDescription(`Подожди пару секунд, ты уже отвечал!`);
+        await interaction
+          .reply({
+            embeds: [setEmbedAuthor(embed, user)],
+            ephemeral: true,
+          })
+          .catch();
+      } else if (value === 'right' && this.currentQuestion.isActive) {
+        const rightValue = this.currentQuestion.qData.questionData.values.find(
+          (f) => f.isRight,
+        ).label;
+        const embed = new EmbedBuilder().setColor('#2f54eb');
+        embed.setDescription(
+          `❓ ${this.currentQuestion.qData.questionData.label}\n
+          <@${user.id}> ответил верно! Правильный ответ: **${capitalize(
+            rightValue,
+          )}**`,
+        );
+
+        const cqUser = this.currentQuiz.users.find((f) => f.id === user.id);
+        if (cqUser) {
+          cqUser.points += 1;
+        } else {
+          this.currentQuiz.users.push({ id: user.id, points: 1 });
+        }
+
+        await interaction
+          .update({
+            embeds: [embed],
+            components: [],
+          })
+          .catch();
+
+        this.currentQuestion.isActive = false;
+        setTimeout(async () => {
+          await this.sendQuestion();
+        }, 10000);
+      } else {
+        const embed = new EmbedBuilder().setColor('#f5222d');
+        embed.setDescription(`Неверно, попробуй другой вариант!`);
+        await interaction
+          .reply({
+            embeds: [setEmbedAuthor(embed, user)],
+            ephemeral: true,
+          })
+          .catch();
+      }
+      setDelay();
     }
   }
 

@@ -79,6 +79,17 @@ export default abstract class Command {
       : Math.abs(parseInt(this.args[0]));
   }
 
+  public getArgSell(argName) {
+    let arg;
+    if (this.isSlash) {
+      arg = this.args.getString(argName);
+    } else {
+      arg = this.args[0];
+    }
+
+    return (arg === 'все' || arg === 'всё') ? 'all' : Math.abs(parseInt(arg)) as any;
+  }
+
   public getArgUser(argName) {
     return this.isSlash
       ? this.args.getUser(argName)
@@ -108,8 +119,12 @@ export default abstract class Command {
     return player;
   }
 
-  public getPrice(factor, price) {
-    return Math.round((factor / 50) * price + price);
+  public getPrice(factor, price, progressBonus?) {
+    let res = Math.round((factor / 50) * price + price);
+    if (progressBonus) {
+      res += (res / 10) * progressBonus;
+    }
+    return res;
   }
 
   public getExitCarrotSize(currentProgress) {
@@ -117,8 +132,11 @@ export default abstract class Command {
     return currentProgress * 30 + 100;
   }
 
-  public canBuy(carrotSize, key, boostCount) {
+  public canBuy(carrotSize, key, boostCount, count?) {
     if (boostCount >= 50) {
+      return false;
+    }
+    if (count && boostCount + count > 50) {
       return false;
     }
     if (carrotSize >= this.config.bot.economy.shopRules[key]) {

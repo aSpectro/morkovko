@@ -20,7 +20,8 @@ export class CWCommand extends Command {
         if (res.status === 200 && res.player) {
           const player = res.player;
           const price = this.getPrice(player.slotsCount, cooldowns.watering);
-          if (player.points >= price && this.canBuy(player.carrotSize, 'cooldowns', player.config.cooldowns.watering)) {
+          const count = this.getArgString('кол-во');
+          if (count && player.points >= price * count && this.canBuy(player.carrotSize, 'cooldowns', player.config.cooldowns.watering, count)) {
             player.config.cooldowns.watering += 1;
             player.points -= price;
             service.savePlayer(player).then((resSave) => {
@@ -41,10 +42,21 @@ export class CWCommand extends Command {
               }
             });
           } else {
-            if (!this.canBuy(player.carrotSize, 'cooldowns', player.config.cooldowns.watering)) {
-              this.embed.setDescription(
-                `Ты не можешь купить этот бонус!`,
-              );
+            if (!count) {
+              this.embed.setDescription(`Ты не указал кол-во!`);
+            } else if (!this.canBuy(player.carrotSize, 'cooldowns', player.config.cooldowns.watering, count)) {
+              const acceptedCount = 50 - (player.config.cooldowns.watering + count);
+              if (acceptedCount <= 0) {
+                this.embed.setDescription(
+                  `Ты не можешь купить этот бонус! Сейчас у тебя ${player.config.cooldowns.watering}/50.`,
+                );
+              } else if (player.carrotSize < this.config.bot.economy.shopRules['cooldowns']) {
+                this.embed.setDescription(`Твоя морковка слишком маленькая!`);
+              } else {
+                this.embed.setDescription(
+                  `Ты можешь купить не больше ${acceptedCount} бонусов! Сейчас у тебя ${player.config.cooldowns.watering}/50.`,
+                );
+              }
             } else {
               this.embed.setDescription(
                 `Тебе не хватает ${price - player.points}🔸!`,

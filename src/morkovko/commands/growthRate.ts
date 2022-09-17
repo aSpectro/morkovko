@@ -20,8 +20,9 @@ export class GRCommand extends Command {
       service.checkUser(user.id).then((res) => {
         if (res.status === 200 && res.player) {
           const player = res.player;
-          const price = this.getPrice(player.slotsCount, slotSpeedUpdate);
-          if (player.points >= price && this.canBuy(player.carrotSize, 'slotSpeedUpdate', player.config.slotSpeedUpdate)) {
+          const price = this.getPrice(player.slotsCount, slotSpeedUpdate, player.progressBonus);
+          const count = this.getArgString('кол-во');
+          if (count && player.points >= price * count && this.canBuy(player.carrotSize, 'slotSpeedUpdate', player.config.slotSpeedUpdate, count)) {
             player.config.slotSpeedUpdate += 1;
             player.points -= price;
             service.savePlayer(player).then((resSave) => {
@@ -42,10 +43,21 @@ export class GRCommand extends Command {
               }
             });
           } else {
-            if (!this.canBuy(player.carrotSize, 'slotSpeedUpdate', player.config.slotSpeedUpdate)) {
-              this.embed.setDescription(
-                `Ты не можешь купить этот бонус!`,
-              );
+            if (!count) {
+              this.embed.setDescription(`Ты не указал кол-во!`);
+            } else if (!this.canBuy(player.carrotSize, 'slotSpeedUpdate', player.config.slotSpeedUpdate, count)) {
+              const acceptedCount = 50 - (player.config.slotSpeedUpdate + count);
+              if (acceptedCount <= 0) {
+                this.embed.setDescription(
+                  `Ты не можешь купить этот бонус! Сейчас у тебя ${player.config.slotSpeedUpdate}/50.`,
+                );
+              } else if (player.carrotSize < this.config.bot.economy.shopRules['slotSpeedUpdate']) {
+                this.embed.setDescription(`Твоя морковка слишком маленькая!`);
+              } else {
+                this.embed.setDescription(
+                  `Ты можешь купить не больше ${acceptedCount} бонусов! Сейчас у тебя ${player.config.slotSpeedUpdate}/50.`,
+                );
+              }
             } else {
               this.embed.setDescription(
                 `Тебе не хватает ${price - player.points}🔸!`,

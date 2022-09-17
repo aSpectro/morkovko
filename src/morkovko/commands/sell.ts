@@ -23,7 +23,8 @@ export class SellCommand extends Command {
           const grabPercent = player.slotsCount >= 50 ? 15 : 5;
           let grab = false;
           if (grabChance <= grabPercent) grab = true;
-          const count = this.getArgString('кол-во');
+          let count: any = this.getArgSell('кол-во');
+          count = count === 'all' ? player.carrotCount : count;
           if (count && player.carrotCount >= count) {
             if (player.carrotCount === 1) grab = false;
             player.carrotCount -= count;
