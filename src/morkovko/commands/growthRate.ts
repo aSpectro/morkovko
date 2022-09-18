@@ -23,8 +23,8 @@ export class GRCommand extends Command {
           const price = this.getPrice(player.slotsCount, slotSpeedUpdate, player.progressBonus);
           const count = this.getArgString('кол-во');
           if (count && player.points >= price * count && this.canBuy(player.carrotSize, 'slotSpeedUpdate', player.config.slotSpeedUpdate, count)) {
-            player.config.slotSpeedUpdate += 1;
-            player.points -= price;
+            player.config.slotSpeedUpdate += count;
+            player.points -= price * count;
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(

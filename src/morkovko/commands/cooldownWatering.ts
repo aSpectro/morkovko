@@ -22,8 +22,8 @@ export class CWCommand extends Command {
           const price = this.getPrice(player.slotsCount, cooldowns.watering);
           const count = this.getArgString('кол-во');
           if (count && player.points >= price * count && this.canBuy(player.carrotSize, 'cooldowns', player.config.cooldowns.watering, count)) {
-            player.config.cooldowns.watering += 1;
-            player.points -= price;
+            player.config.cooldowns.watering += count;
+            player.points -= price * count;
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(

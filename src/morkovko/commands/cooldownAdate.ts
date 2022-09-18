@@ -22,8 +22,8 @@ export class CACommand extends Command {
           const price = this.getPrice(player.slotsCount, cooldowns.adate);
           const count = this.getArgString('кол-во');
           if (count && player.points >= price * count && this.canBuy(player.carrotSize, 'cooldowns', player.config.cooldowns.adate, count)) {
-            player.config.cooldowns.adate += 1;
-            player.points -= price;
+            player.config.cooldowns.adate += count;
+            player.points -= price * count;
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
