@@ -51,22 +51,22 @@ export class InventoryCommand extends Command {
             },
             {
               name: 'Бонус скорости роста',
-              value: `📈 **${player.config.slotSpeedUpdate}%**`,
+              value: `📈 **${player.config.slotSpeedUpdate}%/50%**`,
               inline: true,
             },
             {
               name: 'Бонус кулдауна свидания',
-              value: `👨🏻‍🤝‍👨🏻 **${player.config.cooldowns.adate}%**`,
+              value: `👨🏻‍🤝‍👨🏻 **${player.config.cooldowns.adate}%/50%**`,
               inline: true,
             },
             {
               name: 'Бонус кулдауна полива',
-              value: `💧 **${player.config.cooldowns.watering}%**`,
+              value: `💧 **${player.config.cooldowns.watering}%/50%**`,
               inline: true,
             },
             {
               name: 'Бонус кулдауна молитвы',
-              value: `🙏 **${player.config.cooldowns.pray}%**`,
+              value: `🙏 **${player.config.cooldowns.pray}%/50%**`,
               inline: true,
             },
           );

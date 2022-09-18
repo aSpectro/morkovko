@@ -27,7 +27,7 @@ export class CPCommand extends Command {
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Ты уменьшил кулдаун молитвы на 1%. Текущий бонус **${player.config.cooldowns.pray}%**`,
+                  `Ты уменьшил кулдаун молитвы на ${count}%. Текущий бонус **${player.config.cooldowns.pray}%**`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],

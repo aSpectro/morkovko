@@ -27,7 +27,7 @@ export class CACommand extends Command {
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Ты уменьшил кулдаун свидания на 1%. Текущий бонус **${player.config.cooldowns.adate}%**`,
+                  `Ты уменьшил кулдаун свидания на ${count}%. Текущий бонус **${player.config.cooldowns.adate}%**`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],

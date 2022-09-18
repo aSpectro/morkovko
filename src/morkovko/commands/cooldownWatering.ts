@@ -27,7 +27,7 @@ export class CWCommand extends Command {
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Ты уменьшил кулдаун полива на 1%. Текущий бонус **${player.config.cooldowns.watering}%**`,
+                  `Ты уменьшил кулдаун полива на ${count}%. Текущий бонус **${player.config.cooldowns.watering}%**`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
