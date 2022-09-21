@@ -23,6 +23,9 @@ export class UpgradeCommand extends Command {
           const count = this.getArgString('кол-во');
           if (count && player.points >= count * price && count <= 5) {
             player.carrotSize += count;
+            if (player.config.stars.isDung) {
+              player.carrotSize += 1;
+            }
             player.points -= count * price;
             player.carrotAvatar = this.getRandomAvatar();
             service.savePlayer(player).then((resSave) => {

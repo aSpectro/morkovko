@@ -21,6 +21,12 @@ import { GRCommand } from './growthRate';
 import { CACommand } from './cooldownAdate';
 import { CWCommand } from './cooldownWatering';
 import { CPCommand } from './cooldownPray';
+import { DonateCommand } from './donate';
+import { StatsCommand } from './stats';
+import { StarsCommand } from './stars';
+import { DungCommand } from './dung';
+import { DebufCommand } from './debuf';
+import { ThiefCommand } from './thief';
 
 import { NCCommand } from './admin/nc'; // обнулить морковки
 import { NPCommand } from './admin/np'; // обнулить очки
@@ -52,6 +58,12 @@ export default [
   new CACommand('кулдаун-свидание'),
   new CWCommand('кулдаун-полив'),
   new CPCommand('кулдаун-молитва'),
+  new DonateCommand('пожертвовать'),
+  new StatsCommand('статистика'),
+  new StarsCommand('звезды'),
+  new DungCommand('удобрение'),
+  new DebufCommand('дебаф'),
+  new ThiefCommand('вор'),
   // admin commands
   new NCCommand('nc'),
   new NPCommand('np'),

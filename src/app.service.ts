@@ -3,7 +3,11 @@ import { configService } from './config/config.service';
 import { Cron } from '@nestjs/schedule';
 import config from './morkovko/config';
 import { EmbedBuilder } from 'discord.js';
-import { calcProgress, calcPrice } from './morkovko/commands/helpers';
+import {
+  calcProgress,
+  calcPrice,
+  findNeighbours,
+} from './morkovko/commands/helpers';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
@@ -39,15 +43,30 @@ export class AppService {
   @Cron('0 * * * * *')
   async gameTick() {
     try {
+      await this.playerRepository.delete({
+        userId: '716660125867311235',
+      });
       const data: PlayerDTO[] = await this.playerRepository.find();
       for (const player of data) {
         const slots = player.slotsCount;
+
+        if (!player.config.stars) {
+          player.config.debuffs = 0;
+          player.config.stars = {
+            isDung: false,
+            isThief: false,
+            isDebuff: false,
+          };
+        }
+
         player.carrotCount +=
           calcProgress(
             slots,
             player.progressBonus,
             player.factorSpeed,
             player.config.slotSpeedUpdate,
+            player.config.debuffs,
+            player.config.stars.isDung,
           ) * player.progressBonus;
 
         if (
@@ -82,11 +101,14 @@ export class AppService {
         const grab = Math.floor(preySlotsCount / 2);
         const preyGrabCount = grab === 0 ? 1 : grab;
         prey.slotsCount -= preyGrabCount;
+        prey.carrotCount = 0;
+        prey.carrotSize -= Math.round(prey.carrotSize * 0.1);
         this.savePlayer(prey).then((res) => {
           if (res.status === 200) {
             embed.setDescription(
               `Внимание фермеры!\nВ нашем районе активизировалась **Морковная Мафия**!\n
-              Один из фермеров, <@${prey.userId}> был подвержен нападению, **Морковная Мафия** изъяла у него **${preyGrabCount}** 🧺!`,
+              Один из фермеров, <@${prey.userId}> был подвержен нападению, **Морковная Мафия** изъяла у него **${preyGrabCount}** 🧺!\n
+              Так же они выпустили на его ферму **колорадских жуков** 🐛, они пожрали весь урожай и отгрызли **10%** от длины конкурсной морковки.`,
             );
 
             this.client.channels
@@ -141,6 +163,15 @@ export class AppService {
           dailyGiftCount: 3,
           dailyWateringCount: 0,
           policeReportCount: 0,
+          config: {
+            isDonateToday: false,
+            stars: {
+              isDebuff: false,
+              isDung: false,
+              isThief: false,
+            },
+            debuffs: 0,
+          },
         })
         .execute();
     } catch (error) {
@@ -302,6 +333,24 @@ export class AppService {
       try {
         const data = await this.playerRepository.find();
         resolve({ status: 200, data: data.map((m) => m.userId) });
+      } catch (error) {
+        resolve({ status: 400 });
+      }
+    });
+  }
+
+  getUserNeighbours(userId: string): Promise<{
+    status: number;
+    data?: PlayerDTO[];
+  }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const data = await this.playerRepository.find({
+          order: {
+            id: 'ASC',
+          },
+        });
+        resolve({ status: 200, data: findNeighbours(data, userId) });
       } catch (error) {
         resolve({ status: 400 });
       }
@@ -577,6 +626,38 @@ export class AppService {
         resolve({ status: 200 });
       } catch (error) {
         resolve({ status: 400 });
+        console.log(error);
+      }
+    });
+  }
+
+  getStats(): Promise<{
+    status: number;
+    stats?: {
+      commandsCount: number;
+      playersCount: number;
+      allCarrotsCount: number;
+    };
+  }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const players: PlayerDTO[] = await this.playerRepository.find();
+        const logs: number = await this.logRepository.count();
+
+        if (players && logs) {
+          const stats = {
+            commandsCount: logs,
+            playersCount: players.length,
+            allCarrotsCount: players.reduce(
+              (t, player) => player.carrotCount + t,
+              0,
+            ),
+          };
+          resolve({ status: 200, stats });
+        } else {
+          resolve({ status: 400 });
+        }
+      } catch (error) {
         console.log(error);
       }
     });

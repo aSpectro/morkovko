@@ -1,4 +1,5 @@
 import { EmbedBuilder } from 'discord.js';
+import { PlayerDTO } from 'src/dto/player.dto';
 
 export function noUserEmbed(user) {
   const embedError = new EmbedBuilder()
@@ -23,7 +24,15 @@ export function setEmbedAuthor(embed, user) {
 }
 
 export function getRelLevelName(level: number) {
-  if (level >= 10 && level < 20) {
+  if (level < -90) {
+    return 'Придет день и вы сожгете фермы друг друга';
+  } else if (level < -60 && level >= -90) {
+    return 'Враги';
+  } else if (level < -30 && level >= -60) {
+    return 'Невыносимые знакомые';
+  } else if (level < 0 && level >= -30) {
+    return 'Неприятные знакомые';
+  } else if (level >= 10 && level < 20) {
     return 'Приятные знакомые';
   } else if (level >= 20 && level < 30) {
     return 'Потенциальные друзья';
@@ -99,6 +108,8 @@ export function calcProgress(
   progressBonus,
   factorSpeed,
   slotSpeedUpdate,
+  debuffs,
+  isDung,
 ) {
   const pBonus = progressBonus === 1 ? 0 : progressBonus;
   const speedBonus = slotSpeedUpdate === 1 ? 0 : slotSpeedUpdate;
@@ -107,6 +118,14 @@ export function calcProgress(
   progress += (progress / 100) * pBonus;
   progress += (progress / 100) * (speedBonus > 50 ? 50 : speedBonus);
   progress += (progress / 100) * factor;
+  if (isDung) {
+    progress += progress * 0.1;
+  }
+  if (debuffs > 0) {
+    for (let i = 0; i < debuffs; i++) {
+      progress -= progress * 0.5;
+    }
+  }
   return Math.floor(progress);
 }
 
@@ -116,4 +135,26 @@ export function calcNumberWithPercentBoost(number, boost) {
 
 export function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export function findNeighbours(players: PlayerDTO[], userId: string) {
+  const neighbours: PlayerDTO[] = [];
+  const userIndex = players.findIndex((f) => f.userId === userId);
+
+  if (players.length >= 3) {
+    if (userIndex > 0 && userIndex < players.length - 1) {
+      neighbours.push(players[userIndex - 1]);
+      neighbours.push(players[userIndex + 1]);
+    } else if (userIndex > 0 && userIndex === players.length - 1) {
+      neighbours.push(players[userIndex - 1]);
+      neighbours.push(players[0]);
+    } else {
+      neighbours.push(players[players.length - 1]);
+      neighbours.push(players[userIndex + 1]);
+    }
+  } else if (players.length === 2) {
+    neighbours.push(players.find((f) => f.userId !== userId));
+  }
+
+  return neighbours;
 }

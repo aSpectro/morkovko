@@ -16,6 +16,13 @@ const config = {
     watering: 0,
     pray: 0,
   },
+  isDonateToday: false,
+  stars: {
+    isDung: false,
+    isThief: false,
+    isDebuff: false,
+  },
+  debuffs: 0,
 };
 
 @Entity()

@@ -1,5 +1,5 @@
 import Command from './Command';
-import { setEmbedAuthor, getChance } from './helpers';
+import { setEmbedAuthor, getChance, randomIntFromInterval } from './helpers';
 import { AppService } from './../../app.service';
 
 export class SellCommand extends Command {
@@ -40,16 +40,40 @@ export class SellCommand extends Command {
               await service.saveFund(fund);
             }
 
-            service.savePlayer(player).then((resSave) => {
+            service.savePlayer(player).then(async (resSave) => {
               if (resSave.status === 200) {
                 if (grab) {
-                  this.embed.setDescription(
-                    `Во время продажи тебя кто-то увидел и позвонил в налоговую, у тебя изъяли ${
-                      grabCount === 0 ? 1 : grabCount
-                    }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${
-                      count - grabCount
-                    }🥕. Теперь у тебя на счету ${player.points}🔸`,
+                  const neighbours = await this.service.getUserNeighbours(
+                    user.id,
                   );
+                  const neighbourNumber =
+                    neighbours.data.length === 2
+                      ? randomIntFromInterval(0, 1)
+                      : 0;
+                  if (
+                    neighbours &&
+                    neighbours.status === 200 &&
+                    neighbours.data.length > 0
+                  ) {
+                    const neighbour = neighbours.data[neighbourNumber];
+                    this.embed.setDescription(
+                      `Во время продажи тебя увидел твой сосед - <@${
+                        neighbour.userId
+                      }> и сдал тебя налоговой, у тебя изъяли ${
+                        grabCount === 0 ? 1 : grabCount
+                      }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${
+                        count - grabCount
+                      }🥕. Теперь у тебя на счету ${player.points}🔸`,
+                    );
+                  } else {
+                    this.embed.setDescription(
+                      `Во время продажи тебя кто-то увидел и позвонил в налоговую, у тебя изъяли ${
+                        grabCount === 0 ? 1 : grabCount
+                      }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${
+                        count - grabCount
+                      }🥕. Теперь у тебя на счету ${player.points}🔸`,
+                    );
+                  }
                 } else {
                   this.embed.setDescription(
                     `Ты продал ${count}🥕. Теперь у тебя на счету ${player.points}🔸`,

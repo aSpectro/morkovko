@@ -50,10 +50,25 @@ export class FriendCommand extends Command {
                     relations = 'Вы еще не знакомы с этим игроком.';
                   }
 
+                  const pugalo = playerMention.hasPugalo
+                    ? 'Пугало: **есть**'
+                    : 'Пугало: **нет**';
+
+                  const neighbours = await this.service.getUserNeighbours(
+                    userMention.id,
+                  );
+                  let neighboursString = 'нет соседей';
+                  if (neighbours.data.length > 0) {
+                    neighboursString = neighbours.data
+                      .map((m) => `<@${m.userId}>`)
+                      .join(', ');
+                  }
+
                   this.embed.setDescription(
                     `**${
                       userMention.username
-                    }**\nРазмер морковки **${playerMention.carrotSize.toLocaleString()}** см.\n${relations}`,
+                    }**\nРазмер морковки **${playerMention.carrotSize.toLocaleString()}** см.\n${pugalo}\n${relations}\n
+                    Соседи: ${neighboursString}`,
                   );
                   this.send({
                     embeds: [setEmbedAuthor(this.embed, user)],

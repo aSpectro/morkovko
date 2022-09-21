@@ -42,8 +42,18 @@ export class HelpCommand extends Command {
             inline: true,
           },
           {
+            name: '!продать',
+            value: 'Продать морковку за ОУ: **!продать <кол-во/все>**',
+            inline: true,
+          },
+          {
             name: '!магазин',
             value: 'Магазин за ОУ',
+            inline: true,
+          },
+          {
+            name: '!звезды',
+            value: 'Магазин звезд',
             inline: true,
           },
           {
@@ -81,6 +91,17 @@ export class HelpCommand extends Command {
             name: '!игрок',
             value:
               'Посмотреть информацию об игроке, его морковку, узнать уровень отношений. **!игрок @<никнейм>**',
+            inline: true,
+          },
+          {
+            name: '!пожертвовать',
+            value:
+              'Пожертвовать в фонд викторины морковки. **!пожертвовать <кол-во>**',
+            inline: true,
+          },
+          {
+            name: '!статистика',
+            value: 'Игровая статистика.',
             inline: true,
           },
         );

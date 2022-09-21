@@ -102,11 +102,7 @@ export class QuizService {
         },
       });
 
-      if (fund) {
-        fund.isActive = false;
-        await this.fundRepository.save(fund);
-        this.createFund({});
-      } else {
+      if (!fund) {
         this.createFund({});
       }
     } catch (error) {
@@ -258,6 +254,7 @@ export class QuizService {
           const fund = fundRes.fund;
           fund.isActive = false;
           await this.saveFund(fund);
+          await this.createFund({});
         }
       })
       .catch(console.error);

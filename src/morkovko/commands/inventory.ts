@@ -15,19 +15,30 @@ export class InventoryCommand extends Command {
   ) {
     this.initCommand(message, args, service, isSlash, () => {
       const user = this.getUser();
-      service.checkUser(user.id).then((res) => {
+      service.checkUser(user.id).then(async (res) => {
         if (res.status === 200) {
           const player = res.player;
           const maxSlots = getMaxSlots(getCarrotLevel(player.carrotSize));
           const playerSlots = player.slotsCount;
+          const neighbours = await this.service.getUserNeighbours(user.id);
+          let neighboursString = 'у тебя нет соседей';
+          if (neighbours.data.length > 0) {
+            neighboursString = neighbours.data
+              .map((m) => `<@${m.userId}>`)
+              .join(', ');
+          }
 
           this.embed.setDescription(`**Инвентарь**\n
-          Твой постоянный бонус прогресса **${player.progressBonus}**\n
+          Твой постоянный бонус прогресса **${
+            player.progressBonus
+          }**\nТвои соседи на ферме: ${neighboursString}\n
           Пугало: ${
             player.hasPugalo ? '**есть**' : '**нет**'
           }\nАвтопокупка пугала: ${
             player.config.autoBuyPugalo ? '**активна**' : '**нет**'
-          }\nДневной лимит подарков: **${player.dailyGiftCount}/3**`);
+          }\nДневной лимит подарков: **${
+            player.dailyGiftCount
+          }/3**\nДебафы: **${player.config.debuffs}**`);
           this.embed.addFields(
             {
               name: 'Морковок',

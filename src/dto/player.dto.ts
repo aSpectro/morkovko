@@ -16,6 +16,13 @@ export interface Config {
     watering: number;
     pray: number;
   };
+  isDonateToday: boolean;
+  stars: {
+    isDung: boolean;
+    isThief: boolean;
+    isDebuff: boolean;
+  };
+  debuffs: number;
 }
 
 export interface PlayerDTO {

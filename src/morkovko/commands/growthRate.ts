@@ -60,7 +60,7 @@ export class GRCommand extends Command {
               }
             } else {
               this.embed.setDescription(
-                `Тебе не хватает ${price - player.points}🔸!`,
+                `Тебе не хватает ${(price * count) - player.points}🔸!`,
               );
             }
             this.send({
