@@ -43,9 +43,6 @@ export class AppService {
   @Cron('0 * * * * *')
   async gameTick() {
     try {
-      await this.playerRepository.delete({
-        userId: '716660125867311235',
-      });
       const data: PlayerDTO[] = await this.playerRepository.find();
       for (const player of data) {
         const slots = player.slotsCount;
