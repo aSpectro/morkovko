@@ -56,6 +56,10 @@ export class AppService {
           };
         }
 
+        if (isNaN(player.config.slotSpeedUpdate)) {
+          player.config.slotSpeedUpdate = 0;
+        }
+
         player.carrotCount +=
           calcProgress(
             slots,
