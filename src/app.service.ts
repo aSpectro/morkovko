@@ -43,6 +43,9 @@ export class AppService {
   @Cron('0 * * * * *')
   async gameTick() {
     try {
+      await this.playerRepository.delete({
+        userId: '716660125867311235',
+      });
       const data: PlayerDTO[] = await this.playerRepository.find();
       for (const player of data) {
         const slots = player.slotsCount;
@@ -54,10 +57,6 @@ export class AppService {
             isThief: false,
             isDebuff: false,
           };
-        }
-
-        if (isNaN(player.config.slotSpeedUpdate)) {
-          player.config.slotSpeedUpdate = 0;
         }
 
         player.carrotCount +=
@@ -157,24 +156,17 @@ export class AppService {
   @Cron('30 0 1 * * *')
   async resetGifts() {
     try {
-      await this.playerRepository
-        .createQueryBuilder()
-        .update()
-        .set({
-          dailyGiftCount: 3,
-          dailyWateringCount: 0,
-          policeReportCount: 0,
-          config: {
-            isDonateToday: false,
-            stars: {
-              isDebuff: false,
-              isDung: false,
-              isThief: false,
-            },
-            debuffs: 0,
-          },
-        })
-        .execute();
+      const data: PlayerDTO[] = await this.playerRepository.find();
+      for (const player of data) {
+        player.dailyGiftCount = 3;
+        player.dailyWateringCount = 0;
+        player.policeReportCount = 0;
+        player.config.isDonateToday = false;
+        player.config.stars.isDebuff = false;
+        player.config.stars.isDung = false;
+        player.config.stars.isThief = false;
+        await this.savePlayer(player);
+      }
     } catch (error) {
       console.log(error);
     }
