@@ -1,7 +1,7 @@
 import Command from './Command';
 import { AttachmentBuilder } from 'discord.js';
 import { createCanvas, loadImage } from 'canvas';
-import { setEmbedAuthor, getRelLevelName } from './helpers';
+import { setEmbedAuthor, getRelLevelName, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
 
 export class FriendCommand extends Command {
@@ -67,7 +67,9 @@ export class FriendCommand extends Command {
                   this.embed.setDescription(
                     `**${
                       userMention.username
-                    }**\nРазмер морковки **${playerMention.carrotSize.toLocaleString()}** см.\n${pugalo}\n${relations}\n
+                    }**\nРазмер морковки **${abbreviateNumber(
+                      playerMention.carrotSize,
+                    )}** см.\n${pugalo}\n${relations}\n
                     Соседи: ${neighboursString}`,
                   );
                   this.send({

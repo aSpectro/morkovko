@@ -1,5 +1,5 @@
 import Command from './Command';
-import { setEmbedAuthor } from './helpers';
+import { setEmbedAuthor, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
 
 export class UpgradeCommand extends Command {
@@ -23,7 +23,7 @@ export class UpgradeCommand extends Command {
           const count = this.getArgString('кол-во');
           if (count && player.points >= count * price && count <= 5) {
             player.carrotSize += count;
-            if (player.config.stars.isDung) {
+            if (player.config.stars.isDung && player.carrotSize % 5 === 0) {
               player.carrotSize += 1;
             }
             player.points -= count * price;
@@ -31,7 +31,9 @@ export class UpgradeCommand extends Command {
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Ты увеличил конкурсную морковку. Теперь ее размер **${player.carrotSize}** см! Возможно она мутировала.`,
+                  `Ты увеличил конкурсную морковку. Теперь ее размер **${abbreviateNumber(
+                    player.carrotSize,
+                  )}** см! Возможно она мутировала.`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
@@ -54,7 +56,9 @@ export class UpgradeCommand extends Command {
               );
             } else {
               this.embed.setDescription(
-                `Тебе не хватает ${count * price - player.points}🔸!`,
+                `Тебе не хватает ${abbreviateNumber(
+                  count * price - player.points,
+                )}🔸!`,
               );
             }
             this.send({

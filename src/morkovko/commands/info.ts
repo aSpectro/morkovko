@@ -4,6 +4,7 @@ import {
   setEmbedAuthor,
   getTimeFromMins,
   calcNumberWithPercentBoost,
+  abbreviateNumber,
 } from './helpers';
 import { AppService } from './../../app.service';
 
@@ -85,9 +86,9 @@ export class InfoCommand extends Command {
           ) {
             exit = `Можно выкти и получить бонусы!`;
           } else {
-            exit = `Чтобы выкти, нужно вырастить морковку еще на **${
-              this.getExitCarrotSize(player.progressBonus) - player.carrotSize
-            }см**`;
+            exit = `Чтобы выкти, нужно вырастить морковку еще на **${abbreviateNumber(
+              this.getExitCarrotSize(player.progressBonus) - player.carrotSize,
+            )}см**`;
           }
 
           this.embed.setDescription(

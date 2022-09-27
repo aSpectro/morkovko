@@ -1,5 +1,5 @@
 import Command from './Command';
-import { setEmbedAuthor } from './helpers';
+import { setEmbedAuthor, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
 
 export class StatsCommand extends Command {
@@ -19,9 +19,15 @@ export class StatsCommand extends Command {
         if (res.status === 200) {
           const statsRes = await this.service.getStats();
           if (statsRes && statsRes.status === 200) {
-            const commandsCount = `Команд вызвано: ${statsRes.stats.commandsCount.toLocaleString()}\n`;
-            const playersCount = `Всего игроков: ${statsRes.stats.playersCount.toLocaleString()}\n`;
-            const allCarrotsCount = `Морковок в игре: ${statsRes.stats.allCarrotsCount.toLocaleString()}\n`;
+            const commandsCount = `Команд вызвано: ${abbreviateNumber(
+              statsRes.stats.commandsCount,
+            )}\n`;
+            const playersCount = `Всего игроков: ${abbreviateNumber(
+              statsRes.stats.playersCount,
+            )}\n`;
+            const allCarrotsCount = `Морковок в игре: ${abbreviateNumber(
+              statsRes.stats.allCarrotsCount,
+            )}\n`;
             this.embed.setDescription(
               `${playersCount + allCarrotsCount + commandsCount}`,
             );

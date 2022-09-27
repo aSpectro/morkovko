@@ -6,9 +6,9 @@ import {
   Unique,
 } from 'typeorm';
 
-import { Relation, Config } from '../dto/player.dto';
+import { Relation, Config, Wars } from '../dto/player.dto';
 
-const config = {
+const config: Config = {
   autoBuyPugalo: false,
   slotSpeedUpdate: 0,
   cooldowns: {
@@ -23,6 +23,10 @@ const config = {
     isDebuff: false,
   },
   debuffs: 0,
+};
+
+const warsConfig: Wars = {
+  heroes: [],
 };
 
 @Entity()
@@ -87,4 +91,7 @@ export class PlayerEntity {
 
   @Column({ type: 'jsonb', default: config })
   config: Config;
+
+  @Column({ type: 'jsonb', default: warsConfig })
+  wars: Wars;
 }

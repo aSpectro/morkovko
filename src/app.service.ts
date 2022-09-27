@@ -7,6 +7,7 @@ import {
   calcProgress,
   calcPrice,
   findNeighbours,
+  abbreviateNumber,
 } from './morkovko/commands/helpers';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -56,6 +57,10 @@ export class AppService {
           };
         }
 
+        for (const hero of player.wars.heroes) {
+          hero.exp += player.progressBonus * 1;
+        }
+
         player.carrotCount +=
           calcProgress(
             slots,
@@ -82,54 +87,48 @@ export class AppService {
     }
   }
 
-  @Cron('30 0 */12 * * *')
+  @Cron('30 0 * * * *')
   async gameMafia() {
-    if (!configService.isProduction()) return;
     try {
       const data: PlayerDTO[] = await this.playerRepository.find({
         where: {
           hasPugalo: false,
+          slotsCount: MoreThan(10),
         },
       });
-      const prey = data[Math.floor(Math.random() * data.length)];
-      const preySlotsCount = prey ? prey.slotsCount : 1;
-      const embed = new EmbedBuilder().setColor('#f97a50');
-      if (preySlotsCount > 1) {
-        const grab = Math.floor(preySlotsCount / 2);
-        const preyGrabCount = grab === 0 ? 1 : grab;
-        prey.slotsCount -= preyGrabCount;
-        prey.carrotCount = 0;
-        prey.carrotSize -= Math.round(prey.carrotSize * 0.1);
-        this.savePlayer(prey).then((res) => {
-          if (res.status === 200) {
-            embed.setDescription(
-              `Внимание фермеры!\nВ нашем районе активизировалась **Морковная Мафия**!\n
-              Один из фермеров, <@${prey.userId}> был подвержен нападению, **Морковная Мафия** изъяла у него **${preyGrabCount}** 🧺!\n
-              Так же они выпустили на его ферму **колорадских жуков** 🐛, они пожрали весь урожай и отгрызли **10%** от длины конкурсной морковки.`,
-            );
 
-            this.client.channels
-              .fetch(mafiaChannelId)
-              .then((channel: any) => {
-                channel.send({ embeds: [embed] });
-              })
-              .catch(console.error);
-            this.deletePugalos();
-          }
-        });
+      for (const player of data) {
+        const grab = Math.floor(player.slotsCount / 2);
+        const preyGrabCount = grab === 0 ? 1 : grab;
+        player.slotsCount -= preyGrabCount;
+        player.carrotCount = 0;
+        player.carrotSize -= Math.round(player.carrotSize * 0.1);
+        await this.savePlayer(player);
+      }
+
+      const embed = new EmbedBuilder().setColor('#f97a50');
+
+      if (data.length > 0) {
+        const playersMentions = data.map((m) => `<@${m.userId}>`).join(', ');
+        embed.setDescription(
+          `Внимание фермеры!\nВ нашем районе активизировалась **Морковная Мафия**!\n
+          ${playersMentions} были подвержены нападению, **Морковная Мафия** изъяла у них половину 🧺!\n
+          Так же они выпустили на их фермы **колорадских жуков** 🐛, они пожрали весь урожай и отгрызли **10%** от длины конкурсных морковок.`,
+        );
       } else {
         embed.setDescription(
           `Внимание фермеры!\nВ нашем районе активизировалась **Морковная Мафия**!\n
           К счастью, никто из фермеров не был подвержен нападению!`,
         );
-
-        this.client.channels
-          .fetch(mafiaChannelId)
-          .then((channel: any) => {
-            channel.send({ embeds: [embed] });
-          })
-          .catch(console.error);
       }
+
+      this.client.channels
+        .fetch(mafiaChannelId)
+        .then((channel: any) => {
+          channel.send({ embeds: [embed] });
+        })
+        .catch(console.error);
+      this.deletePugalos();
     } catch (error) {
       console.log(error);
     }
@@ -162,6 +161,7 @@ export class AppService {
         player.config.stars.isDebuff = false;
         player.config.stars.isDung = false;
         player.config.stars.isThief = false;
+        player.config.debuffs = 0;
         await this.savePlayer(player);
       }
     } catch (error) {
@@ -289,7 +289,7 @@ export class AppService {
         embed.setDescription(
           `**В эфире криминальные новости!**\n
           Департамент региональной безопасности и противодействия моррупции Морковного края провел спец. операцию по противодействию моррупции по добыче и сбыту морковки. В ходе операции был задержан и оштрафован <@${userId}>.\n
-          Молиция оштрафовала его на **${price}** 🥕!\n
+          Молиция оштрафовала его на **${abbreviateNumber(price)}** 🥕!\n
           Граждане фермеры, наш департамент благодарит всех законопослушных граждан и желает им хорошего урожая!`,
         );
 

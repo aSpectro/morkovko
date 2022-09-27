@@ -1,5 +1,5 @@
 import Command from './Command';
-import { setEmbedAuthor } from './helpers';
+import { setEmbedAuthor, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
 import e from 'express';
 
@@ -60,7 +60,7 @@ export class GRCommand extends Command {
               }
             } else {
               this.embed.setDescription(
-                `Тебе не хватает ${(price * count) - player.points}🔸!`,
+                `Тебе не хватает ${abbreviateNumber((price * count) - player.points)}🔸!`,
               );
             }
             this.send({

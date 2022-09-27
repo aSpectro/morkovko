@@ -9,7 +9,11 @@ import {
   ButtonStyle,
 } from 'discord.js';
 import { RedisService } from 'nestjs-redis';
-import { setEmbedAuthor, capitalize } from './../morkovko/commands/helpers';
+import {
+  setEmbedAuthor,
+  capitalize,
+  abbreviateNumber,
+} from './../morkovko/commands/helpers';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -51,7 +55,7 @@ export class QuizService {
     await this.redis.flushall('ASYNC');
   }
 
-  @Cron('10 0 16 * * *')
+  @Cron('10 0 12,16,21 * * *')
   async startPlayQuiz() {
     try {
       const fund: FundDTO = await this.fundRepository.findOne({
@@ -64,9 +68,9 @@ export class QuizService {
         const embed = new EmbedBuilder().setColor('#2f54eb');
         embed.setDescription(
           `На горизонте появилась странная сцена, кажется **Фонд борьбы с моррупцией** начал свою ежедневную викторину.\n
-          Размер призового фонда **${fund.fundSize.toLocaleString()}** 🥕.\n
+          Размер призового фонда **${abbreviateNumber(fund.fundSize)}** 🥕.\n
           На табличке с правилами написано:\n
-          1. Викторина проходит каждый день, в 16:00 МСК.\n
+          1. Викторина проходит каждый день, в 12:00, 16:00, 21:00 МСК.\n
           2. Размер призового фонда зависит от деятельности молиции и фонда.\n
           3. В викторине 10 вопросов, первый фермер ответивший верно получает 1 балл.\n
           4. По истечению вопросов, игрок, набравший больше всех баллов получает морковки из призового фонда.\n
@@ -217,13 +221,13 @@ export class QuizService {
         embed.setDescription(
           `**Встречайте победителей викторины!**\n
           🏆 ${winnersMention} набрали больше всех баллов - **${maxPoints}**!\n
-          Их приз: **${prize.toLocaleString()}** 🥕 каждому!`,
+          Их приз: **${abbreviateNumber(prize)}** 🥕 каждому!`,
         );
       } else {
         embed.setDescription(
           `**Встречайте победителя викторины!**\n
           🏆 <@${winners[0].id}> набрал больше всех баллов - **${maxPoints}**!\n
-          Его приз: **${prize.toLocaleString()}** 🥕!`,
+          Его приз: **${abbreviateNumber(prize)}** 🥕!`,
         );
       }
 

@@ -1,5 +1,5 @@
 import Command from './Command';
-import { setEmbedAuthor } from './helpers';
+import { setEmbedAuthor, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
 
 export class TopCommand extends Command {
@@ -27,7 +27,9 @@ export class TopCommand extends Command {
               this.embed.setDescription(
                 `Твое место в рейтинге **${
                   userRate + 1
-                }**! Размер морковки **${player.carrotSize.toLocaleString()}** см`,
+                }**! Размер морковки **${abbreviateNumber(
+                  player.carrotSize,
+                )}** см`,
               );
 
               const data = resTop.data.slice(0, 4);
@@ -46,7 +48,9 @@ export class TopCommand extends Command {
                   };
                   this.embed.addFields({
                     name: `${i + 1}. ${field.nickname}`,
-                    value: `Размер морковки **${field.size.toLocaleString()}** см`,
+                    value: `Размер морковки **${abbreviateNumber(
+                      field.size,
+                    )}** см`,
                   });
                 }
                 this.send({

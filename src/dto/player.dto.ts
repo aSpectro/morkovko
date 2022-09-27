@@ -1,3 +1,6 @@
+import { BonusType } from 'src/enums';
+import { Hero } from 'src/helpers/heroes';
+
 export interface Slot {
   progress: number;
   factor: number;
@@ -6,6 +9,15 @@ export interface Slot {
 export interface Relation {
   userId: string;
   level: number;
+}
+
+export interface Wars {
+  bossBonus?: {
+    type: BonusType;
+    size: number;
+  };
+  lastAttackDate?: Date;
+  heroes: { name: string; level: number; exp: number; hero?: Hero }[];
 }
 
 export interface Config {
@@ -46,6 +58,7 @@ export interface PlayerDTO {
   stars: number;
   dailyWateringCount: number;
   policeReportCount: number;
+  wars: Wars;
 }
 
 export interface PlayerReqDTO {

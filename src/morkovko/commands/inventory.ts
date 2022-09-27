@@ -1,5 +1,10 @@
 import Command from './Command';
-import { setEmbedAuthor, getCarrotLevel, getMaxSlots } from './helpers';
+import {
+  setEmbedAuthor,
+  getCarrotLevel,
+  getMaxSlots,
+  abbreviateNumber,
+} from './helpers';
 import { AppService } from './../../app.service';
 
 export class InventoryCommand extends Command {
@@ -42,22 +47,24 @@ export class InventoryCommand extends Command {
           this.embed.addFields(
             {
               name: 'Морковок',
-              value: `🥕 ${player.carrotCount.toLocaleString()}`,
+              value: `🥕 ${abbreviateNumber(player.carrotCount)}`,
               inline: true,
             },
             {
               name: 'Очков улучшений',
-              value: `🔸 ${player.points.toLocaleString()}`,
+              value: `🔸 ${abbreviateNumber(player.points)}`,
               inline: true,
             },
             {
               name: 'Горшков',
-              value: `🧺 **${playerSlots}/${maxSlots}**`,
+              value: `🧺 **${abbreviateNumber(playerSlots)}/${abbreviateNumber(
+                maxSlots,
+              )}**`,
               inline: true,
             },
             {
               name: 'Звезд',
-              value: `⭐ ${player.stars.toLocaleString()}`,
+              value: `⭐ ${abbreviateNumber(player.stars)}`,
               inline: true,
             },
             {

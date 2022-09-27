@@ -1,7 +1,7 @@
 import Command from './Command';
 import { AttachmentBuilder } from 'discord.js';
 import { createCanvas, loadImage } from 'canvas';
-import { setEmbedAuthor } from './helpers';
+import { setEmbedAuthor, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
 
 export class CarrotCommand extends Command {
@@ -33,7 +33,7 @@ export class CarrotCommand extends Command {
 
           if (carrot) {
             this.embed.setDescription(
-              `Размер морковки **${player.carrotSize.toLocaleString()}** см`,
+              `Размер морковки **${abbreviateNumber(player.carrotSize)}** см`,
             );
             this.send({
               embeds: [setEmbedAuthor(this.embed, user)],

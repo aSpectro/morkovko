@@ -1,5 +1,5 @@
 import Command from './Command';
-import { setEmbedAuthor } from './helpers';
+import { setEmbedAuthor, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
 
 export class DonateCommand extends Command {
@@ -38,7 +38,9 @@ export class DonateCommand extends Command {
 
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
-                this.embed.setDescription(`Ты пожертвовал **${count}** 🥕.`);
+                this.embed.setDescription(
+                  `Ты пожертвовал **${abbreviateNumber(count)}** 🥕.`,
+                );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
                 });
@@ -49,13 +51,17 @@ export class DonateCommand extends Command {
               this.embed.setDescription(`Ты не указал кол-во 🥕!`);
             } else if (count > maxDonate) {
               this.embed.setDescription(
-                `В день можно пожертвовать максимум **100 000**🥕 и только один раз!`,
+                `В день можно пожертвовать максимум **${abbreviateNumber(
+                  maxDonate,
+                )}**🥕 и только один раз!`,
               );
             } else if (player.config.isDonateToday) {
               this.embed.setDescription(`Сегодня ты уже пожертвовал 🥕!`);
             } else {
               this.embed.setDescription(
-                `Тебе не хватает ${count - player.carrotCount}🥕!`,
+                `Тебе не хватает ${abbreviateNumber(
+                  count - player.carrotCount,
+                )}🥕!`,
               );
             }
             this.send({

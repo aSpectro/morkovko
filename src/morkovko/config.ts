@@ -1,4 +1,5 @@
 import { configService } from './../config/config.service';
+import { BonusType } from 'src/enums';
 
 export default {
   admin: configService.getAdminId(),
@@ -11,6 +12,34 @@ export default {
     carrotsLimit: configService.getCarrotsLimit(),
     clientId: configService.getClientId(),
     guildId: configService.geGuildId(),
+    wars: {
+      bonuses: [
+        [BonusType.debuf, 10],
+        [BonusType.health, 10],
+        [BonusType.fury, 15],
+        [BonusType.dawn, 5],
+      ],
+      k: 1.2,
+      expLevel: 5000,
+      expBattle: 100,
+      boss: {
+        attackCount: 150,
+        healthCount: 1500,
+        level: 5,
+      },
+      heroes: {
+        jake: 150,
+        bob: 250000,
+        ded: 200,
+        rebot: 120,
+        viktor: 235000,
+        john: 190000,
+        salieri: 275000,
+        antonio: 300000,
+        don: 150000,
+        freddy: 220000,
+      },
+    },
     economy: {
       pray: [5000, 10000, 15000, 20000], // возможные значения за молитву
       exitStars: 100, // кол-во звезд за прогресс
@@ -24,7 +53,7 @@ export default {
         // цены в магазине звезд
         debuff: 25,
         thief: 10,
-        dung: 20,
+        dung: 35,
         fine: 30,
       },
       maxDonate: 100000, // максимальное кол-во пожертвования
@@ -34,7 +63,7 @@ export default {
       pugalo: 1000, // цена пугала
       upgrade: 2500, // цена увеличения морковки
       slot: 100, // цена горшка
-      autoBuyPugalo: 100000, // цена бонуса автопокупки пугала
+      autoBuyPugalo: 75000, // цена бонуса автопокупки пугала
       slotSpeedUpdate: 1000, // цена бонуса скорости роста
       cooldowns: {
         // цены бонусов кулдаунов

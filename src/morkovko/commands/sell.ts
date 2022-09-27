@@ -1,5 +1,10 @@
 import Command from './Command';
-import { setEmbedAuthor, getChance, randomIntFromInterval } from './helpers';
+import {
+  setEmbedAuthor,
+  getChance,
+  randomIntFromInterval,
+  abbreviateNumber,
+} from './helpers';
 import { AppService } from './../../app.service';
 
 export class SellCommand extends Command {
@@ -60,23 +65,31 @@ export class SellCommand extends Command {
                       `Во время продажи тебя увидел твой сосед - <@${
                         neighbour.userId
                       }> и сдал тебя налоговой, у тебя изъяли ${
-                        grabCount === 0 ? 1 : grabCount
-                      }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${
-                        count - grabCount
-                      }🥕. Теперь у тебя на счету ${player.points}🔸`,
+                        grabCount === 0 ? 1 : abbreviateNumber(grabCount)
+                      }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${abbreviateNumber(
+                        count - grabCount,
+                      )}🥕. Теперь у тебя на счету ${abbreviateNumber(
+                        player.points,
+                      )}🔸`,
                     );
                   } else {
                     this.embed.setDescription(
                       `Во время продажи тебя кто-то увидел и позвонил в налоговую, у тебя изъяли ${
-                        grabCount === 0 ? 1 : grabCount
-                      }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${
-                        count - grabCount
-                      }🥕. Теперь у тебя на счету ${player.points}🔸`,
+                        grabCount === 0 ? 1 : abbreviateNumber(grabCount)
+                      }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${abbreviateNumber(
+                        count - grabCount,
+                      )}🥕. Теперь у тебя на счету ${abbreviateNumber(
+                        player.points,
+                      )}🔸`,
                     );
                   }
                 } else {
                   this.embed.setDescription(
-                    `Ты продал ${count}🥕. Теперь у тебя на счету ${player.points}🔸`,
+                    `Ты продал ${abbreviateNumber(
+                      count,
+                    )}🥕. Теперь у тебя на счету ${abbreviateNumber(
+                      player.points,
+                    )}🔸`,
                   );
                 }
                 this.send({
@@ -96,7 +109,9 @@ export class SellCommand extends Command {
               this.embed.setDescription(`Ты не указал кол-во 🥕!`);
             } else {
               this.embed.setDescription(
-                `Тебе не хватает ${count - player.carrotCount}🥕!`,
+                `Тебе не хватает ${abbreviateNumber(
+                  count - player.carrotCount,
+                )}🥕!`,
               );
             }
             this.send({

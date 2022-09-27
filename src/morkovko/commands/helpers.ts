@@ -1,5 +1,6 @@
 import { EmbedBuilder } from 'discord.js';
 import { PlayerDTO } from 'src/dto/player.dto';
+import { heroesMap } from './../../helpers/heroes';
 
 export function noUserEmbed(user) {
   const embedError = new EmbedBuilder()
@@ -157,4 +158,20 @@ export function findNeighbours(players: PlayerDTO[], userId: string) {
   }
 
   return neighbours;
+}
+
+export function abbreviateNumber(value: number) {
+  return Intl.NumberFormat('ru-RU', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
+export function getHeroByName(heroName) {
+  return heroesMap[heroName];
+}
+
+export function normalizeHeroName(heroName) {
+  const name = heroName ? capitalize(heroName.toLowerCase()) : heroName;
+  return name;
 }

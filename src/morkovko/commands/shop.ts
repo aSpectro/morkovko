@@ -1,5 +1,10 @@
 import Command from './Command';
-import { setEmbedAuthor, getCarrotLevel, getMaxSlots } from './helpers';
+import {
+  setEmbedAuthor,
+  getCarrotLevel,
+  getMaxSlots,
+  abbreviateNumber,
+} from './helpers';
 import { AppService } from './../../app.service';
 
 export class ShopCommand extends Command {
@@ -29,9 +34,10 @@ export class ShopCommand extends Command {
           const carrotLevel = getCarrotLevel(player.carrotSize);
           const maxSlots = getMaxSlots(carrotLevel);
           const playerSlots = player.slotsCount;
-          this.embed
-            .setDescription(`Морковок: **🥕 ${player.carrotCount.toLocaleString()}**\n
-          Очков улучшений: **🔸 ${player.points.toLocaleString()}**`);
+          this.embed.setDescription(`Морковок: **🥕 ${abbreviateNumber(
+            player.carrotCount,
+          )}**\n
+          Очков улучшений: **🔸 ${abbreviateNumber(player.points)}**`);
 
           this.embed.addFields(
             {
@@ -41,25 +47,24 @@ export class ShopCommand extends Command {
             },
             {
               name: '!купить',
-              value: `**${playerSlots}/${maxSlots}** Купить горшок за ${this.getPrice(
-                playerSlots,
-                slot,
+              value: `**${abbreviateNumber(playerSlots)}/${abbreviateNumber(
+                maxSlots,
+              )}** Купить горшок за ${abbreviateNumber(
+                this.getPrice(playerSlots, slot),
               )} 🔸.`,
               inline: true,
             },
             {
               name: '!увеличить',
-              value: `Увеличить конкурсную морковку за **${this.getPrice(
-                playerSlots,
-                upgrade,
+              value: `Увеличить конкурсную морковку за **${abbreviateNumber(
+                this.getPrice(playerSlots, upgrade),
               )}🔸** на 1см. **!увеличить <кол-во>**`,
               inline: true,
             },
             {
               name: '!пугало',
-              value: `Купить пугало за ${this.getPrice(
-                playerSlots,
-                pugalo,
+              value: `Купить пугало за ${abbreviateNumber(
+                this.getPrice(playerSlots, pugalo),
               )} 🔸, которое отпугивает мафию, но в обед и полночь ваш сосед ворует ваше пугало`,
               inline: true,
             },
@@ -76,9 +81,8 @@ export class ShopCommand extends Command {
           ) {
             this.embed.addFields({
               name: '!скорость-роста',
-              value: `Увеличить скорость роста морковок на **1%** за ${this.getPrice(
-                playerSlots,
-                slotSpeedUpdate,
+              value: `Увеличить скорость роста морковок на **1%** за ${abbreviateNumber(
+                this.getPrice(playerSlots, slotSpeedUpdate),
               )} 🔸.`,
               inline: true,
             });
@@ -91,9 +95,8 @@ export class ShopCommand extends Command {
           ) {
             this.embed.addFields({
               name: '!автопокупка-пугала',
-              value: `Купить автопокупку пугала за ${this.getPrice(
-                playerSlots,
-                autoBuyPugalo,
+              value: `Купить автопокупку пугала за ${abbreviateNumber(
+                this.getPrice(playerSlots, autoBuyPugalo),
               )} 🔸. Пугало будет покупаться автоматически при наличии необходимого кол-ва 🔸 на счету.`,
               inline: true,
             });
@@ -105,25 +108,22 @@ export class ShopCommand extends Command {
             this.embed.addFields(
               {
                 name: '!кулдаун-свидание',
-                value: `Уменьшить кулдаун свидания за ${this.getPrice(
-                  playerSlots,
-                  cooldowns.adate,
+                value: `Уменьшить кулдаун свидания за ${abbreviateNumber(
+                  this.getPrice(playerSlots, cooldowns.adate),
                 )} 🔸 на **1%**.`,
                 inline: true,
               },
               {
                 name: '!кулдаун-полив',
-                value: `Уменьшить кулдаун полива за ${this.getPrice(
-                  playerSlots,
-                  cooldowns.watering,
+                value: `Уменьшить кулдаун полива за ${abbreviateNumber(
+                  this.getPrice(playerSlots, cooldowns.watering),
                 )} 🔸 на **1%**.`,
                 inline: true,
               },
               {
                 name: '!кулдаун-молитва',
-                value: `Уменьшить кулдаун молитвы за ${this.getPrice(
-                  playerSlots,
-                  cooldowns.pray,
+                value: `Уменьшить кулдаун молитвы за ${abbreviateNumber(
+                  this.getPrice(playerSlots, cooldowns.pray),
                 )} 🔸 на **1%**.`,
                 inline: true,
               },

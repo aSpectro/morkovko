@@ -8,6 +8,7 @@ import { NestFactory } from '@nestjs/core';
 import { registerSlashCommands } from './morkovko/commands/slashCommands';
 
 import { AppService } from './app.service';
+import { WarsService } from './wars.service';
 import { AppModule } from './app.module';
 import { NFTService } from './nft/nft.service';
 import { NFTModule } from './nft/nft.module';
@@ -16,7 +17,7 @@ import { QuizModule } from './quiz/quiz.module';
 
 import config from './morkovko/config';
 import { configService } from './config/config.service';
-import commandsList from './morkovko/commands';
+import { CommandList } from './morkovko/commands';
 interface ClientModel extends Client {
   commands: Collection<any, any>;
 }
@@ -28,19 +29,21 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 }) as ClientModel;
-client.commands = new Collection();
-for (const command of commandsList) {
-  client.commands.set(command.name, command);
-}
 
 async function MorkovkoApp() {
   const app = await NestFactory.create(AppModule);
   await app.listen(configService.getPort());
   const service = app.get<AppService>(AppService);
+  const wars = app.get<WarsService>(WarsService);
   const quiz = await NestFactory.create(QuizModule);
   await quiz.listen(parseInt(configService.getPort()) + 1);
   const quizService = quiz.get<QuizService>(QuizService);
   await quizService.loadQuestions();
+
+  client.commands = new Collection();
+  for (const command of CommandList(wars)) {
+    client.commands.set(command.name, command);
+  }
 
   registerSlashCommands(
     config.bot.clientId,
@@ -68,6 +71,7 @@ async function MorkovkoApp() {
         });
       }, 300000);
       service.setClient(client);
+      wars.setClient(client);
       quizService.setClient(client);
       quizService.setRedisClient();
       console.log('Morkovko bot ready!');
@@ -97,7 +101,6 @@ async function MorkovkoApp() {
     });
 
     client.on('messageCreate', async (message) => {
-      // console.log(message.channel.id);
       const prefix = config.bot.prefix;
 
       if (

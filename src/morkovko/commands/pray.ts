@@ -4,6 +4,7 @@ import {
   setEmbedAuthor,
   getTimeFromMins,
   calcNumberWithPercentBoost,
+  abbreviateNumber,
 } from './helpers';
 import { AppService } from './../../app.service';
 
@@ -40,7 +41,9 @@ export class PrayCommand extends Command {
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Святая подарила тебе ${prayCarrots}🥕 за молитву!`,
+                  `Святая подарила тебе ${abbreviateNumber(
+                    prayCarrots,
+                  )}🥕 за молитву!`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],

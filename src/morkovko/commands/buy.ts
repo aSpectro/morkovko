@@ -1,5 +1,10 @@
 import Command from './Command';
-import { setEmbedAuthor, getCarrotLevel, getMaxSlots } from './helpers';
+import {
+  setEmbedAuthor,
+  getCarrotLevel,
+  getMaxSlots,
+  abbreviateNumber,
+} from './helpers';
 import { AppService } from './../../app.service';
 
 export class BuyCommand extends Command {
@@ -33,7 +38,9 @@ export class BuyCommand extends Command {
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Ты купил ${count}🧺. Теперь у тебя **${player.slotsCount}** 🧺!`,
+                  `Ты купил ${count}🧺. Теперь у тебя **${abbreviateNumber(
+                    player.slotsCount,
+                  )}** 🧺!`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
@@ -52,11 +59,17 @@ export class BuyCommand extends Command {
               this.embed.setDescription(`Ты не указал кол-во 🧺!`);
             } else if (playerSlots + count > maxSlots) {
               this.embed.setDescription(
-                `Ты не можешь купить ${count} 🧺! Увеличивай конкурсную морковку, сейчас твой лимит **${playerSlots}/${maxSlots}** 🧺`,
+                `Ты не можешь купить ${abbreviateNumber(
+                  count,
+                )} 🧺! Увеличивай конкурсную морковку, сейчас твой лимит **${abbreviateNumber(
+                  playerSlots,
+                )}/${abbreviateNumber(maxSlots)}** 🧺`,
               );
             } else {
               this.embed.setDescription(
-                `Тебе не хватает ${price * count - player.points}🔸!`,
+                `Тебе не хватает ${abbreviateNumber(
+                  price * count - player.points,
+                )}🔸!`,
               );
             }
             this.send({

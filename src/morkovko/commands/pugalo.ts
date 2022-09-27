@@ -1,5 +1,5 @@
 import Command from './Command';
-import { setEmbedAuthor } from './helpers';
+import { setEmbedAuthor, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
 
 export class PugaloCommand extends Command {
@@ -45,7 +45,7 @@ export class PugaloCommand extends Command {
               this.embed.setDescription(`У тебя уже есть пугало!`);
             } else {
               this.embed.setDescription(
-                `Тебе не хватает ${price - player.points}🔸!`,
+                `Тебе не хватает ${abbreviateNumber(price - player.points)}🔸!`,
               );
             }
             this.send({
