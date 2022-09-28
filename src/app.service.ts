@@ -206,6 +206,10 @@ export class AppService {
           'ping',
           'топ',
           'увеличить',
+          'босс',
+          'герои',
+          'герой',
+          'паб'
         ];
         const logs = (
           await this.logRepository.find({
