@@ -209,7 +209,7 @@ export class AppService {
           'босс',
           'герои',
           'герой',
-          'паб'
+          'паб',
         ];
         const logs = (
           await this.logRepository.find({
