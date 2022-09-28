@@ -101,8 +101,8 @@ export class AppService {
         const grab = Math.floor(player.slotsCount / 2);
         const preyGrabCount = grab === 0 ? 1 : grab;
         player.slotsCount -= preyGrabCount;
-        player.carrotCount = 0;
-        player.carrotSize -= Math.round(player.carrotSize * 0.1);
+        player.carrotCount -= Math.round(player.carrotCount * 0.25);
+        player.carrotSize -= Math.round(player.carrotSize * 0.05);
         await this.savePlayer(player);
       }
 
@@ -113,7 +113,7 @@ export class AppService {
         embed.setDescription(
           `Внимание фермеры!\nВ нашем районе активизировалась **Морковная Мафия**!\n
           ${playersMentions} были подвержены нападению, **Морковная Мафия** изъяла у них половину 🧺!\n
-          Так же они выпустили на их фермы **колорадских жуков** 🐛, они пожрали весь урожай и отгрызли **10%** от длины конкурсных морковок.`,
+          Так же они выпустили на их фермы **колорадских жуков** 🐛, они пожрали **25%** урожая и отгрызли **5%** от длины конкурсных морковок.`,
         );
       } else {
         embed.setDescription(
@@ -128,6 +128,15 @@ export class AppService {
           channel.send({ embeds: [embed] });
         })
         .catch(console.error);
+      this.deletePugalos();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Cron('50 0 0 * * *')
+  async pugalosResetTask() {
+    try {
       this.deletePugalos();
     } catch (error) {
       console.log(error);
