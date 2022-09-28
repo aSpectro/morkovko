@@ -64,7 +64,14 @@ export default abstract class Command {
     const log = await this.service.log(logData);
 
     if (log.status === 200) {
-      return callBack();
+      this.embed.setDescription(
+        `**Морковко** в тильте до тех пор, пока все не выскажутся на счет предложений и замечаний на счет обновлений. <#1018490307408568351>`,
+      );
+      this.send({
+        embeds: [setEmbedAuthor(this.embed, this.getUser())],
+      });
+      return;
+      // return callBack();
     }
     return;
   }
