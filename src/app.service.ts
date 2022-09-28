@@ -128,7 +128,6 @@ export class AppService {
           channel.send({ embeds: [embed] });
         })
         .catch(console.error);
-      this.deletePugalos();
     } catch (error) {
       console.log(error);
     }
