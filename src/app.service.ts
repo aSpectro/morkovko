@@ -133,7 +133,7 @@ export class AppService {
     }
   }
 
-  @Cron('50 0 0 * * *')
+  @Cron('50 0 12 * * *')
   async pugalosResetTask() {
     try {
       this.deletePugalos();
