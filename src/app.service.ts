@@ -41,7 +41,7 @@ export class AppService {
     private fundRepository: Repository<FundEntity>,
   ) {}
 
-  // @Cron('0 * * * * *')
+  @Cron('0 * * * * *')
   async gameTick() {
     try {
       const data: PlayerDTO[] = await this.playerRepository.find();
@@ -87,7 +87,7 @@ export class AppService {
     }
   }
 
-  // @Cron('30 0 * * * *')
+  @Cron('30 0 * * * *')
   async gameMafia() {
     try {
       const data: PlayerDTO[] = await this.playerRepository.find({
@@ -133,7 +133,7 @@ export class AppService {
     }
   }
 
-  // @Cron('50 0 0 * * *')
+  @Cron('50 0 0 * * *')
   async pugalosResetTask() {
     try {
       this.deletePugalos();
@@ -142,7 +142,7 @@ export class AppService {
     }
   }
 
-  // @Cron('30 30 */12 * * *')
+  @Cron('30 30 */12 * * *')
   async resetWatering() {
     try {
       await this.playerRepository
@@ -157,7 +157,7 @@ export class AppService {
     }
   }
 
-  // @Cron('30 0 1 * * *')
+  @Cron('30 0 1 * * *')
   async resetGifts() {
     try {
       const data: PlayerDTO[] = await this.playerRepository.find();
@@ -181,7 +181,7 @@ export class AppService {
    * Kassio AC Native v.1.0.1
    * reports reaper
    */
-  // @Cron('0 */5 * * * *')
+  @Cron('0 */5 * * * *')
   async kassioAC() {
     try {
       // fetch all users
