@@ -3,10 +3,15 @@ import { AttachmentBuilder } from 'discord.js';
 import { createCanvas, loadImage } from 'canvas';
 import { setEmbedAuthor, getRelLevelName, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
+import { WarsService } from 'src/wars.service';
 
 export class FriendCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(

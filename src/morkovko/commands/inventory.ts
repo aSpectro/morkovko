@@ -6,10 +6,15 @@ import {
   abbreviateNumber,
 } from './helpers';
 import { AppService } from './../../app.service';
+import { WarsService } from 'src/wars.service';
 
 export class InventoryCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(
@@ -33,6 +38,8 @@ export class InventoryCommand extends Command {
               .join(', ');
           }
 
+          const debuffs = player.config.debuffs;
+
           this.embed.setDescription(`**Инвентарь**\n
           Твой постоянный бонус прогресса **${
             player.progressBonus
@@ -43,7 +50,7 @@ export class InventoryCommand extends Command {
             player.config.autoBuyPugalo ? '**активна**' : '**нет**'
           }\nДневной лимит подарков: **${
             player.dailyGiftCount
-          }/3**\nДебафы: **${player.config.debuffs}**`);
+          }/3**\nДебафы: **${debuffs ? debuffs : 0}**`);
           this.embed.addFields(
             {
               name: 'Морковок',

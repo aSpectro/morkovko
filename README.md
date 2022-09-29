@@ -1,6 +1,6 @@
 # Morkovko
 Discord бот - Nest.js, PostgreSQL, Discord.js
-
+![morkovko.png](https://aspectro.pw/img/morkovko_github.png)
 ### Развертывание
 ```bash
 # development

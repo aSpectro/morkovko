@@ -1,16 +1,10 @@
 import Command from './Command';
 import * as moment from 'moment';
-import {
-  setEmbedAuthor,
-  getTimeFromMins,
-  calcNumberWithPercentBoost,
-  abbreviateNumber,
-} from './helpers';
-import random from 'random';
+import { setEmbedAuthor } from './helpers';
 import { AppService } from './../../app.service';
 import { WarsService } from 'src/wars.service';
 
-export class PrayCommand extends Command {
+export class FairCommand extends Command {
   constructor(
     commandName: string,
     needEvents: boolean,
@@ -28,35 +22,30 @@ export class PrayCommand extends Command {
     this.initCommand(message, args, service, isSlash, () => {
       const user = this.getUser();
       service.checkUser(user.id).then((res) => {
-        if (res.status === 200) {
+        if (res.status === 200 && res.player) {
           const player = res.player;
-          const d1 = moment(player.lastPrayDate);
-          const d2 = moment(new Date());
-          const diff = d2.diff(d1, 'minutes');
-          const needDiff = calcNumberWithPercentBoost(
-            1440,
-            player.config.cooldowns.pray,
-          );
 
-          if (diff >= needDiff) {
-            const counts = this.config.bot.economy.pray;
-            let prayCarrots = counts[Math.floor(random.float(0, 1) * counts.length)];
-            prayCarrots *= player.progressBonus;
-            player.lastPrayDate = moment(new Date()).toDate();
-            player.carrotCount += prayCarrots;
+          if (!player.config?.fair?.isActive) {
+            player.config.fair = {
+              isActive: true,
+              startDate: moment(new Date()).toDate(),
+              reward: {
+                stars: 100,
+                carrots: 100000,
+                exp: 5000,
+              },
+            };
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Святая подарила тебе ${abbreviateNumber(
-                    prayCarrots,
-                  )}🥕 за молитву!`,
+                  `Ты отправился на ярмарку. Теперь ты можешь участвовать в ежедневной викторине и использовать магазин звезд!\nНо не забывай, что ты так же можешь стать жертвой Морковной Мафии или оштрафован Фондом борьбы с моррупцией.`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
                 });
               } else {
                 this.embed.setDescription(
-                  `Не получилось помолиться. Попробуй позже.`,
+                  `Не получилось отправиться на ярмарку. Попробуй позже.`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
@@ -64,11 +53,7 @@ export class PrayCommand extends Command {
               }
             });
           } else {
-            this.embed.setDescription(
-              `Ты сможешь помолиться не раньше чем через ${getTimeFromMins(
-                needDiff - diff,
-              )}!`,
-            );
+            this.embed.setDescription('Ты уже участвуешь в ярмарке!');
             this.send({
               embeds: [setEmbedAuthor(this.embed, user)],
             });

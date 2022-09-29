@@ -14,6 +14,7 @@ import {
   capitalize,
   abbreviateNumber,
 } from './../morkovko/commands/helpers';
+import random from 'random';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -143,7 +144,7 @@ export class QuizService {
       );
       embed.setFooter({ text: `${id}/10` });
 
-      const values = data.values.sort(() => 0.5 - Math.random());
+      const values = data.values.sort(() => 0.5 - random.float(0, 1));
       const row = new ActionRowBuilder();
       const fund: FundDTO = await this.fundRepository.findOne({
         where: {
@@ -241,7 +242,21 @@ export class QuizService {
             },
           });
           if (player) {
-            player.carrotCount += prize;
+            if (player.config.fair.reward.carrots) {
+              player.config.fair.reward.carrots += prize;
+            } else {
+              player.config.fair.reward.carrots = prize;
+            }
+            if (player.config.fair.reward.stars) {
+              player.config.fair.reward.stars += 10;
+            } else {
+              player.config.fair.reward.stars = 10;
+            }
+            if (player.config.fair.reward.exp) {
+              player.config.fair.reward.exp += 5000;
+            } else {
+              player.config.fair.reward.exp = 5000;
+            }
             await this.savePlayer(player);
           }
         } catch (error) {
@@ -266,71 +281,88 @@ export class QuizService {
 
   async processAnswer(interaction: any) {
     const user = interaction.user;
-    const [funId, value, valueId] = interaction.customId.split(':');
-    const fund = await this.fundRepository.findOne({
-      where: {
-        id: funId,
-      },
-    });
+    this.checkUser(user.id).then(async (res) => {
+      if (res.status === 200 && res.player.config?.fair?.isActive) {
+        const [funId, value, valueId] = interaction.customId.split(':');
+        const fund = await this.fundRepository.findOne({
+          where: {
+            id: funId,
+          },
+        });
 
-    const setDelay = () => {
-      this.cooldown.add(user.id);
-      setTimeout(() => {
-        this.cooldown.delete(user.id);
-      }, 3000);
-    };
-    if (!fund || (fund && !fund.isActive)) {
-      const embed = new EmbedBuilder().setColor('#f5222d');
-      embed.setDescription(`Эта викторина уже закончилась!`);
-      await interaction
-        .update({
-          embeds: [embed],
-          components: [],
-        })
-        .catch();
-    } else {
-      if (this.cooldown.has(user.id)) {
-        const embed = new EmbedBuilder().setColor('#f5222d');
-        embed.setDescription(`Подожди пару секунд, ты уже отвечал!`);
-        await interaction
-          .reply({
-            embeds: [setEmbedAuthor(embed, user)],
-            ephemeral: true,
-          })
-          .catch();
-      } else if (value === 'right' && this.currentQuestion.isActive) {
-        const rightValue = this.currentQuestion.qData.questionData.values.find(
-          (f) => f.isRight,
-        ).label;
-        const embed = new EmbedBuilder().setColor('#2f54eb');
-        embed.setDescription(
-          `❓ ${this.currentQuestion.qData.questionData.label}\n
-          <@${user.id}> ответил верно! Правильный ответ: **${capitalize(
-            rightValue,
-          )}**`,
-        );
-
-        const cqUser = this.currentQuiz.users.find((f) => f.id === user.id);
-        if (cqUser) {
-          cqUser.points += 1;
+        const setDelay = () => {
+          this.cooldown.add(user.id);
+          setTimeout(() => {
+            this.cooldown.delete(user.id);
+          }, 3000);
+        };
+        if (!fund || (fund && !fund.isActive)) {
+          const embed = new EmbedBuilder().setColor('#f5222d');
+          embed.setDescription(`Эта викторина уже закончилась!`);
+          await interaction
+            .update({
+              embeds: [embed],
+              components: [],
+            })
+            .catch();
         } else {
-          this.currentQuiz.users.push({ id: user.id, points: 1 });
+          if (this.cooldown.has(user.id)) {
+            const embed = new EmbedBuilder().setColor('#f5222d');
+            embed.setDescription(`Подожди пару секунд, ты уже отвечал!`);
+            await interaction
+              .reply({
+                embeds: [setEmbedAuthor(embed, user)],
+                ephemeral: true,
+              })
+              .catch();
+          } else if (value === 'right' && this.currentQuestion.isActive) {
+            const rightValue =
+              this.currentQuestion.qData.questionData.values.find(
+                (f) => f.isRight,
+              ).label;
+            const embed = new EmbedBuilder().setColor('#2f54eb');
+            embed.setDescription(
+              `❓ ${this.currentQuestion.qData.questionData.label}\n
+              <@${user.id}> ответил верно! Правильный ответ: **${capitalize(
+                rightValue,
+              )}**`,
+            );
+
+            const cqUser = this.currentQuiz.users.find((f) => f.id === user.id);
+            if (cqUser) {
+              cqUser.points += 1;
+            } else {
+              this.currentQuiz.users.push({ id: user.id, points: 1 });
+            }
+
+            await interaction
+              .update({
+                embeds: [embed],
+                components: [],
+              })
+              .catch();
+
+            this.currentQuestion.isActive = false;
+            setTimeout(async () => {
+              await this.sendQuestion();
+            }, 10000);
+          } else {
+            const embed = new EmbedBuilder().setColor('#f5222d');
+            embed.setDescription(`Неверно, попробуй другой вариант!`);
+            await interaction
+              .reply({
+                embeds: [setEmbedAuthor(embed, user)],
+                ephemeral: true,
+              })
+              .catch();
+          }
+          setDelay();
         }
-
-        await interaction
-          .update({
-            embeds: [embed],
-            components: [],
-          })
-          .catch();
-
-        this.currentQuestion.isActive = false;
-        setTimeout(async () => {
-          await this.sendQuestion();
-        }, 10000);
       } else {
         const embed = new EmbedBuilder().setColor('#f5222d');
-        embed.setDescription(`Неверно, попробуй другой вариант!`);
+        embed.setDescription(
+          `Ты не можешь участвовать в викторине, для участия нужно отправиться на ярмарку!\n**!ярмарка**`,
+        );
         await interaction
           .reply({
             embeds: [setEmbedAuthor(embed, user)],
@@ -338,8 +370,7 @@ export class QuizService {
           })
           .catch();
       }
-      setDelay();
-    }
+    });
   }
 
   async loadQuestions() {
@@ -370,7 +401,7 @@ export class QuizService {
           const fillUnRightAnswers = (rightAnswer, array) => {
             return array
               .filter((f) => f.label !== rightAnswer)
-              .sort(() => 0.5 - Math.random())
+              .sort(() => 0.5 - random.float(0, 1))
               .slice(0, 3)
               .map((m) => {
                 m.isRight = false;
@@ -392,7 +423,7 @@ export class QuizService {
             .filter(
               (f) => !f.label || f.values.filter((v) => !v.label).length < 4,
             )
-            .sort(() => 0.5 - Math.random())
+            .sort(() => 0.5 - random.float(0, 1))
             .map((m) => {
               m.values = m.values.map((v) => {
                 v.id = idNum;
@@ -466,6 +497,24 @@ export class QuizService {
         resolve({ status: 200 });
       } catch (error) {
         resolve({ status: 400 });
+        console.log(error);
+      }
+    });
+  }
+
+  checkUser(userId: string): Promise<{ status: number; player?: PlayerDTO }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const player: PlayerDTO = await this.playerRepository.findOne({
+          where: { userId },
+        });
+
+        if (player) {
+          resolve({ status: 200, player });
+        } else {
+          resolve({ status: 400 });
+        }
+      } catch (error) {
         console.log(error);
       }
     });

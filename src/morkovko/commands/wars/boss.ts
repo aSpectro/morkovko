@@ -2,10 +2,15 @@ import Command from './../Command';
 import { setEmbedAuthor, abbreviateNumber } from './../helpers';
 import { AppService } from './../../../app.service';
 import { Boss, mapBonusDescription, Bonus } from './../../../helpers/boss';
+import { WarsService } from 'src/wars.service';
 
 export class BossCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(

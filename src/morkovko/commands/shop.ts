@@ -6,10 +6,15 @@ import {
   abbreviateNumber,
 } from './helpers';
 import { AppService } from './../../app.service';
+import { WarsService } from 'src/wars.service';
 
 export class ShopCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(

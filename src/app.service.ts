@@ -45,6 +45,7 @@ export class AppService {
   async gameTick() {
     try {
       const data: PlayerDTO[] = await this.playerRepository.find();
+      const idsFairEnd = [];
       for (const player of data) {
         const slots = player.slotsCount;
 
@@ -57,8 +58,29 @@ export class AppService {
           };
         }
 
+        let expBonus = 0;
+        if (player.config.fair && player.config.fair.isActive) {
+          const d1 = moment(player.config.fair.startDate);
+          const d2 = moment(new Date());
+          const diff = d2.diff(d1, 'minutes');
+          const needDiff = 4320; // 3 days
+          if (diff >= needDiff) {
+            const stars = player.config.fair.reward?.stars;
+            const carrots = player.config.fair.reward?.carrots;
+            const exp = player.config.fair.reward?.exp;
+            if (stars) player.stars += stars;
+            if (carrots) player.carrotCount += carrots;
+            if (exp) expBonus = exp;
+            player.config.fair.isActive = false;
+            player.config.fair.reward = {};
+            idsFairEnd.push(player.userId);
+          }
+        }
+
         for (const hero of player.wars.heroes) {
-          hero.exp += player.progressBonus * 1;
+          hero.exp +=
+            player.progressBonus * 1 +
+            Math.round(expBonus / player.wars.heroes.length);
         }
 
         player.carrotCount +=
@@ -82,12 +104,26 @@ export class AppService {
 
         this.savePlayer(player);
       }
+
+      if (idsFairEnd.length > 0) {
+        const embed = new EmbedBuilder().setColor('#f97a50');
+        const playersMentions = idsFairEnd.map((m) => `<@${m}>`).join(', ');
+        embed.setDescription(
+          `**Новости Ярмарки**\n${playersMentions} вернулись с ярморки и получили свои награды!`,
+        );
+        this.client.channels
+          .fetch(mafiaChannelId)
+          .then((channel: any) => {
+            channel.send({ embeds: [embed] });
+          })
+          .catch(console.error);
+      }
     } catch (error) {
       console.log(error);
     }
   }
 
-  @Cron('30 0 * * * *')
+  @Cron('30 0 */12 * * *')
   async gameMafia() {
     try {
       const data: PlayerDTO[] = await this.playerRepository.find({
@@ -97,7 +133,7 @@ export class AppService {
         },
       });
 
-      for (const player of data) {
+      for (const player of data.filter((f) => f.config?.fair?.isActive)) {
         const grab = Math.floor(player.slotsCount / 2);
         const preyGrabCount = grab === 0 ? 1 : grab;
         player.slotsCount -= preyGrabCount;
@@ -186,7 +222,7 @@ export class AppService {
     try {
       // fetch all users
       const players: PlayerEntity[] = await this.playerRepository.find();
-      for (const player of players) {
+      for (const player of players.filter((f) => f.config?.fair?.isActive)) {
         const { userId } = player;
         // get last day logs
         const excludes = [

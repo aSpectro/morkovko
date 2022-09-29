@@ -1,3 +1,5 @@
+import random from 'random';
+
 export function getUserFromMention(client, mention) {
   const matches = mention.match(/^<@!?(\d+)>$/);
   const id = matches ? matches[1] : '';
@@ -6,12 +8,12 @@ export function getUserFromMention(client, mention) {
 }
 
 export function randomNumber(max: number, min: number): number {
-  const rand = min + Math.random() * (max + 1 - min);
+  const rand = min + random.float(0, 1) * (max + 1 - min);
   return Math.floor(rand);
 }
 
 export function randomArrayElement(items: any): any {
-  return items[~~(items.length * Math.random())];
+  return items[~~(items.length * random.float(0, 1))];
 }
 
 export function isObjectEmpty(obj): boolean {

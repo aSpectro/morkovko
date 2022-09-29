@@ -1,5 +1,6 @@
 import config from 'src/morkovko/config';
 import { HeroType, BonusType } from './../enums';
+import random from 'random';
 
 export interface Bonus {
   name: string;
@@ -55,7 +56,7 @@ export class Hero {
       this.bonus &&
       this.bonus.type === BonusType.fury
     ) {
-      const chance = Math.random() * 100;
+      const chance = random.float(0, 1) * 100;
       if (chance <= 50) {
         result -= (result / 100) * this.bonus.size;
       }

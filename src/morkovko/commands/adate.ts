@@ -6,10 +6,16 @@ import {
   calcNumberWithPercentBoost,
 } from './helpers';
 import { AppService } from './../../app.service';
+import { WarsService } from 'src/wars.service';
+import random from 'random';
 
 export class AdateCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(
@@ -33,12 +39,15 @@ export class AdateCommand extends Command {
           );
           if (userFriends && userFriends.length > 0) {
             if (diff >= needDiff) {
-              const successChance = Math.random() * 100;
+              const successChance = random.float(0, 1) * 100;
               let isSuccess = false;
               if (successChance >= 10) isSuccess = true;
               const friend =
-                userFriends[Math.floor(Math.random() * userFriends.length)];
-              if (!isSuccess) player.carrotCount -= this.config.economy.adateFail;
+                userFriends[
+                  Math.floor(random.float(0, 1) * userFriends.length)
+                ];
+              if (!isSuccess)
+                player.carrotCount -= this.config.economy.adateFail;
 
               const rels = player.relations.find(
                 (f) => f.userId === friend.userId,

@@ -7,8 +7,9 @@ import { PlayerDTO } from '../../dto/player.dto';
 import { WarsService } from './../../wars.service';
 import { BonusType, Currency } from './../../enums';
 import { Hero } from './../../helpers/heroes';
+import random from 'random';
 
-export default abstract class Command {
+export default class Command {
   public commandName: string;
   public isSlash: boolean;
   public service: AppService;
@@ -18,10 +19,12 @@ export default abstract class Command {
   public wars: WarsService;
   public config;
   private errors: string[] = [];
+  private needEvents: boolean;
 
-  constructor(commandName: string, warsSerive?: WarsService) {
+  constructor(commandName: string, needEvents: boolean, warsSerive?: WarsService) {
     this.commandName = commandName;
     this.wars = warsSerive;
+    this.needEvents = needEvents;
     this.config = config;
   }
 
@@ -32,7 +35,7 @@ export default abstract class Command {
   public async send(messageData) {
     if (this.isSlash) await this.message.reply(messageData).catch();
     else
-      await this.message.channel.send(messageData).catch(() => console.log(''));
+      await this.message.reply(messageData).catch(() => console.log(''));
   }
 
   public async initCommand(
@@ -64,6 +67,16 @@ export default abstract class Command {
     const log = await this.service.log(logData);
 
     if (log.status === 200) {
+      const res = await this.service.checkUser(this.getUser().id);
+      if (this.needEvents && res.status === 200 && !res.player.config?.fair?.isActive) {
+        this.embed.setDescription(
+          `Ты не можешь использовать эту команду, тебе нужно участвовать в ярмарке или квесте!\n**!ярмарка**`,
+        );
+        this.send({
+          embeds: [setEmbedAuthor(this.embed, this.getUser())],
+        });
+        return;
+      }
       return callBack();
     }
     return;
@@ -90,7 +103,7 @@ export default abstract class Command {
       : Math.abs(parseInt(this.args[0]));
   }
 
-  public getArgSell(argName) {
+  public getArgAll(argName) {
     let arg;
     if (this.isSlash) {
       arg = this.args.getString(argName);
@@ -212,7 +225,7 @@ export default abstract class Command {
 
   public async createBoss(player: PlayerDTO) {
     const bonuses = config.bot.wars.bonuses;
-    const bonus = bonuses[Math.floor(Math.random() * bonuses.length)]
+    const bonus = bonuses[Math.floor(random.float(0, 1) * bonuses.length)]
     player.wars.bossBonus = {
       type: bonus[0] as BonusType,
       size: bonus[1] as number
@@ -227,5 +240,37 @@ export default abstract class Command {
       hero.exp += avgExp;
     });
     return await this.service.savePlayer(player);
+  }
+
+  public getMaxAllCount(player: PlayerDTO, isUpgrade?: boolean): number {
+    let res = 0;
+    let slots = player.slotsCount;
+    let points = player.points;
+    const calc = () => {
+      const price = this.getPrice(slots, config.bot.economy.upgrade);
+      const d = points - price;
+      if (d >= 0) {
+        res += 1;
+        if (isUpgrade) {
+          slots += 1;
+        }
+        calc()
+      }
+    }
+    calc();
+    return res;
+  }
+
+  public getAllPrice(player: PlayerDTO, count: number, isUpgrade?: boolean): number {
+    let res = 0;
+    let slots = player.slotsCount;
+    for (let i = 0; i < count; i++) {
+      const price = this.getPrice(slots, config.bot.economy.upgrade);
+      res += price;
+      if (isUpgrade) {
+        slots += 1;
+      }
+    }
+    return res;
   }
 }

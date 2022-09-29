@@ -20,7 +20,18 @@ export interface Wars {
   heroes: { name: string; level: number; exp: number; hero?: Hero }[];
 }
 
+export interface Reward {
+  stars?: number;
+  carrots?: number;
+  exp?: number;
+}
+
 export interface Config {
+  fair?: {
+    isActive: boolean;
+    startDate: Date;
+    reward: Reward;
+  };
   autoBuyPugalo: boolean;
   slotSpeedUpdate: number;
   cooldowns: {

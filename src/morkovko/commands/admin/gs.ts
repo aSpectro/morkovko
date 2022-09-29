@@ -1,9 +1,14 @@
 import Command from './../Command';
 import { AppService } from './../../../app.service';
+import { WarsService } from 'src/wars.service';
 
 export class GSCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(

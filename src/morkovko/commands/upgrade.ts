@@ -1,10 +1,15 @@
 import Command from './Command';
 import { setEmbedAuthor, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
+import { WarsService } from 'src/wars.service';
 
 export class UpgradeCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(
@@ -15,13 +20,13 @@ export class UpgradeCommand extends Command {
   ) {
     this.initCommand(message, args, service, isSlash, () => {
       const user = this.getUser();
-      const { upgrade } = this.config.bot.economy;
       service.checkUser(user.id).then((res) => {
         if (res.status === 200) {
           const player = res.player;
-          const price = this.getPrice(player.slotsCount, upgrade);
-          const count = this.getArgString('кол-во');
-          if (count && player.points >= count * price && count <= 5) {
+          let count: any = this.getArgAll('кол-во');
+          count = count === 'all' ? this.getMaxAllCount(player) : count;
+          const price = this.getAllPrice(player, count, true);
+          if (count && player.points >= price) {
             player.carrotSize += count;
             if (player.config.stars.isDung && player.carrotSize % 5 === 0) {
               player.carrotSize += 1;
@@ -48,12 +53,10 @@ export class UpgradeCommand extends Command {
               }
             });
           } else {
-            if (!count) {
+            if (this.getArgAll('кол-во') === 'all' && count === 0) {
+              this.embed.setDescription(`Тебе пока не хватает 🔸!`);
+            } else if (this.getArgAll('кол-во') !== 'all' && !count) {
               this.embed.setDescription(`Ты не указал кол-во раз!`);
-            } else if (count > 5) {
-              this.embed.setDescription(
-                `За раз, морковку можно увеличить только на 5см!`,
-              );
             } else {
               this.embed.setDescription(
                 `Тебе не хватает ${abbreviateNumber(

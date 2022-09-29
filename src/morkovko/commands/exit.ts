@@ -1,11 +1,15 @@
 import Command from './Command';
-import { abbreviateNumber, setEmbedAuthor } from './helpers';
+import { setEmbedAuthor } from './helpers';
 import { AppService } from './../../app.service';
 import { WarsService } from 'src/wars.service';
 
 export class ExitCommand extends Command {
-  constructor(commandName: string, warsService: WarsService) {
-    super(commandName, warsService);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(
@@ -27,41 +31,14 @@ export class ExitCommand extends Command {
             );
           };
 
-          const exitResult = async (battle?) => {
-            let resBattle = '';
-            if (battle && battle.status === 200) {
-              resBattle = `**Результаты битвы с боссом: ${
-                battle.status === 200 ? 'Победа' : 'Поражение'
-              }**\nОпыта получено: ${abbreviateNumber(
-                battle.result.player.exp,
-              )} ⚪\nЗдоровье босса: ${abbreviateNumber(
-                battle.result.boss.healthCount,
-              )} 💚`;
-            } else if (battle && battle.status === 400) {
-              resBattle = `**Результаты битвы с боссом: ${
-                battle.status === 200 ? 'Победа' : 'Поражение'
-              }**\nОпыта получено: ${abbreviateNumber(
-                battle.result.player.exp,
-              )} ⚪\nЗдоровье босса: ${abbreviateNumber(
-                battle.result.boss.healthCount,
-              )} 💚`;
-              this.embed.setDescription(
-                `${resBattle}\n**Победи босса, чтобы выкти!**`,
-              );
-              this.send({
-                embeds: [setEmbedAuthor(this.embed, user)],
-              });
-              return;
-            }
+          const exitResult = async () => {
             this.resetPlayer(player);
             player.progressBonus += 1;
-            player.stars += this.config.bot.economy.exitStars;
             const resSave = await this.service.savePlayer(player);
             if (resSave.status === 200) {
               this.embed.setDescription(
                 `Твоя морковка достаточно большая, ты успешно вышел из игры, твой прогресс был сброшен! Поздравляю 💚!\n
-                Теперь у тебя постоянный бонус ${player.progressBonus}% к скорости роста морковки и x${player.progressBonus} кол-ву выращенной морковки и за молитву.\n
-                Так же ты получил **${this.config.bot.economy.exitStars}**⭐. Звезды можно обменять в специальном магазине на доп. бонусы.\n${resBattle}`,
+                Теперь у тебя постоянный бонус ${player.progressBonus}% к скорости роста морковки и x${player.progressBonus} кол-ву выращенной морковки и за молитву.\n`,
               );
               this.send({
                 embeds: [setEmbedAuthor(this.embed, user)],
@@ -75,27 +52,7 @@ export class ExitCommand extends Command {
             if (
               player.carrotSize >= this.getExitCarrotSize(player.progressBonus)
             ) {
-              let needBoss = false;
-              if (player.progressBonus >= 3) {
-                needBoss = true;
-              }
-
-              if (needBoss) {
-                if (!player.wars.bossBonus) {
-                  this.createBoss(player);
-                }
-                const battle = await this.wars.initBattle(player);
-                if (battle.status === 200) {
-                  await this.createBoss(player);
-                  await this.setHeroesExp(player, battle.result.player.exp);
-                } else {
-                  await this.setHeroesExp(player, battle.result.player.exp);
-                }
-
-                exitResult(battle);
-              } else {
-                exitResult();
-              }
+              exitResult();
             } else {
               exitPing();
             }

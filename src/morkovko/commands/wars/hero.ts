@@ -8,10 +8,15 @@ import { AppService } from './../../../app.service';
 import { Currency, Actions, HeroType } from './../../../enums';
 import { heroesMap, Hero } from './../../../helpers/heroes';
 import { PlayerDTO } from '../../../dto/player.dto';
+import { WarsService } from 'src/wars.service';
 
 export class HeroCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(

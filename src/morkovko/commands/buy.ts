@@ -6,10 +6,15 @@ import {
   abbreviateNumber,
 } from './helpers';
 import { AppService } from './../../app.service';
+import { WarsService } from 'src/wars.service';
 
 export class BuyCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(
@@ -27,7 +32,8 @@ export class BuyCommand extends Command {
           const price = this.getPrice(player.slotsCount, slot);
           const maxSlots = getMaxSlots(getCarrotLevel(player.carrotSize));
           const playerSlots = player.slotsCount;
-          const count = this.getArgString('кол-во');
+          let count: any = this.getArgAll('кол-во');
+          count = count === 'all' ? maxSlots - playerSlots : count;
           if (
             count &&
             player.points >= count * price &&
@@ -55,9 +61,15 @@ export class BuyCommand extends Command {
               }
             });
           } else {
-            if (!count) {
+            if (
+              this.getArgAll('кол-во') === 'all' &&
+              count === 0 &&
+              playerSlots + count < maxSlots
+            ) {
+              this.embed.setDescription(`Тебе пока не хватает 🔸!`);
+            } else if (this.getArgAll('кол-во') !== 'all' && !count) {
               this.embed.setDescription(`Ты не указал кол-во 🧺!`);
-            } else if (playerSlots + count > maxSlots) {
+            } else if (playerSlots + count >= maxSlots) {
               this.embed.setDescription(
                 `Ты не можешь купить ${abbreviateNumber(
                   count,

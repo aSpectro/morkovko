@@ -4,6 +4,7 @@ import {
   ActivityType,
   GatewayIntentBits,
 } from 'discord.js';
+import random from 'random';
 import { NestFactory } from '@nestjs/core';
 import { registerSlashCommands } from './morkovko/commands/slashCommands';
 
@@ -61,7 +62,7 @@ async function MorkovkoApp() {
         service.getUsersIds().then((res) => {
           if (res.status === 200) {
             const userId =
-              res.data[Math.floor(Math.random() * res.data.length)];
+              res.data[Math.floor(random.float(0, 1) * res.data.length)];
             client.users.fetch(userId).then((user) => {
               client.user.setActivity(`за очком ${user.username}`, {
                 type: ActivityType.Watching,

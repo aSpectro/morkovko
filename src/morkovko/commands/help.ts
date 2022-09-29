@@ -1,9 +1,14 @@
 import Command from './Command';
 import { AppService } from './../../app.service';
+import { WarsService } from 'src/wars.service';
 
 export class HelpCommand extends Command {
-  constructor(commandName: string) {
-    super(commandName);
+  constructor(
+    commandName: string,
+    needEvents: boolean,
+    warsService?: WarsService,
+  ) {
+    super(commandName, needEvents, warsService);
   }
 
   run(
@@ -104,7 +109,8 @@ export class HelpCommand extends Command {
             value: 'Игровая статистика.',
             inline: true,
           },
-        );
+        )
+        .setImage('https://aspectro.pw/img/morkovko_github.png');
       this.send({ embeds: [this.embed] });
     });
   }

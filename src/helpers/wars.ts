@@ -4,6 +4,7 @@ import { Hero } from './heroes';
 import { Boss, Bonus } from './boss';
 import config from '../morkovko/config';
 import { getHeroByName } from './../morkovko/commands/helpers';
+import random from 'random';
 
 export interface Result {
   player: {
@@ -82,7 +83,7 @@ export function calcBattleResult(
 
       debufEnemies.forEach((hero) => {
         const size = hero.bonus.size;
-        const chance = Math.random() * 100;
+        const chance = random.float(0, 1) * 100;
         if (chance <= 50) {
           avgAttack -= (avgAttack / 100) * size;
         }
@@ -111,7 +112,7 @@ export function calcBattleResult(
 
       debufHeroes.forEach((hero) => {
         const size = hero.bonus.size;
-        const chance = Math.random() * 100;
+        const chance = random.float(0, 1) * 100;
         if (chance <= 50) {
           avgAttackEnemies -= (avgAttackEnemies / 100) * size;
         }
@@ -135,11 +136,13 @@ export function calcBattleResult(
 
       dawnEnemies.forEach((hero) => {
         const size = hero.bonus.size;
-        const chance = Math.random() * 100;
+        const chance = random.float(0, 1) * 100;
         if (chance <= size) {
           const filteredHeroes = heroes.filter((f) => f.getHealth() > 0);
           const hero =
-            filteredHeroes[Math.floor(Math.random() * filteredHeroes.length)];
+            filteredHeroes[
+              Math.floor(random.float(0, 1) * filteredHeroes.length)
+            ];
           hero.kill();
         }
       });
