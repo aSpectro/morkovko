@@ -132,8 +132,9 @@ export class AppService {
           slotsCount: MoreThan(10),
         },
       });
+      const dataFiltered = data.filter((f) => f.config?.fair?.isActive);
 
-      for (const player of data.filter((f) => f.config?.fair?.isActive)) {
+      for (const player of dataFiltered) {
         const grab = Math.floor(player.slotsCount / 2);
         const preyGrabCount = grab === 0 ? 1 : grab;
         player.slotsCount -= preyGrabCount;
@@ -144,8 +145,10 @@ export class AppService {
 
       const embed = new EmbedBuilder().setColor('#f97a50');
 
-      if (data.length > 0) {
-        const playersMentions = data.map((m) => `<@${m.userId}>`).join(', ');
+      if (dataFiltered.length > 0) {
+        const playersMentions = dataFiltered
+          .map((m) => `<@${m.userId}>`)
+          .join(', ');
         embed.setDescription(
           `Внимание фермеры!\nВ нашем районе активизировалась **Морковная Мафия**!\n
           ${playersMentions} были подвержены нападению, **Морковная Мафия** изъяла у них половину 🧺!\n
