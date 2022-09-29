@@ -69,7 +69,7 @@ export class BuyCommand extends Command {
               this.embed.setDescription(`Тебе пока не хватает 🔸!`);
             } else if (this.getArgAll('кол-во') !== 'all' && !count) {
               this.embed.setDescription(`Ты не указал кол-во 🧺!`);
-            } else if (playerSlots + count >= maxSlots) {
+            } else if (playerSlots + count > maxSlots) {
               this.embed.setDescription(
                 `Ты не можешь купить ${abbreviateNumber(
                   count,

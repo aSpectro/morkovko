@@ -24,14 +24,14 @@ export class UpgradeCommand extends Command {
         if (res.status === 200) {
           const player = res.player;
           let count: any = this.getArgAll('кол-во');
-          count = count === 'all' ? this.getMaxAllCount(player) : count;
+          count = count === 'all' ? this.getMaxAllCount(player, true) : count;
           const price = this.getAllPrice(player, count, true);
           if (count && player.points >= price) {
             player.carrotSize += count;
             if (player.config.stars.isDung && player.carrotSize % 5 === 0) {
               player.carrotSize += 1;
             }
-            player.points -= count * price;
+            player.points -= price;
             player.carrotAvatar = this.getRandomAvatar();
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
@@ -58,10 +58,9 @@ export class UpgradeCommand extends Command {
             } else if (this.getArgAll('кол-во') !== 'all' && !count) {
               this.embed.setDescription(`Ты не указал кол-во раз!`);
             } else {
+              console.log(price, count);
               this.embed.setDescription(
-                `Тебе не хватает ${abbreviateNumber(
-                  count * price - player.points,
-                )}🔸!`,
+                `Тебе не хватает ${abbreviateNumber(price - player.points)}🔸!`,
               );
             }
             this.send({
