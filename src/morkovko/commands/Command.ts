@@ -246,15 +246,18 @@ export default class Command {
     let res = 0;
     let slots = player.slotsCount;
     let points = player.points;
+    const max = 100000;
     const calc = () => {
       const price = this.getPrice(slots, config.bot.economy.upgrade);
       points -= price;
-      if (points >= 0) {
+      if (points >= 0 && res < max) {
         res += 1;
         if (isUpgrade) {
           slots += 1;
         }
-        calc()
+        setTimeout(() => {
+          calc();
+        }, 0);
       }
     }
     calc();
