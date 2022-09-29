@@ -30,7 +30,7 @@ export class UpgradeCommand extends Command {
           if (count && player.points >= price) {
             player.carrotSize += count;
             if (player.config.stars.isDung && player.carrotSize % 5 === 0) {
-              player.carrotSize += 1;
+              player.carrotSize += Math.round(count / 5);
             }
             player.points -= price;
             player.carrotAvatar = this.getRandomAvatar();
