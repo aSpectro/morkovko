@@ -6,7 +6,7 @@ import {
   calcNumberWithPercentBoost,
   abbreviateNumber,
 } from './helpers';
-import random from 'random';
+import random from 'src/helpers/random';
 import { AppService } from './../../app.service';
 import { WarsService } from 'src/wars.service';
 
@@ -40,7 +40,7 @@ export class PrayCommand extends Command {
 
           if (diff >= needDiff) {
             const counts = this.config.bot.economy.pray;
-            let prayCarrots = counts[Math.floor(random.float(0, 1) * counts.length)];
+            let prayCarrots = counts[Math.floor(random.float() * counts.length)];
             prayCarrots *= player.progressBonus;
             player.lastPrayDate = moment(new Date()).toDate();
             player.carrotCount += prayCarrots;

@@ -7,7 +7,7 @@ import {
 } from './helpers';
 import { AppService } from './../../app.service';
 import { WarsService } from 'src/wars.service';
-import random from 'random';
+import random from 'src/helpers/random';
 
 export class AdateCommand extends Command {
   constructor(
@@ -39,12 +39,12 @@ export class AdateCommand extends Command {
           );
           if (userFriends && userFriends.length > 0) {
             if (diff >= needDiff) {
-              const successChance = random.float(0, 1) * 100;
+              const successChance = random.float() * 100;
               let isSuccess = false;
               if (successChance >= 10) isSuccess = true;
               const friend =
                 userFriends[
-                  Math.floor(random.float(0, 1) * userFriends.length)
+                  Math.floor(random.float() * userFriends.length)
                 ];
               if (!isSuccess)
                 player.carrotCount -= this.config.economy.adateFail;

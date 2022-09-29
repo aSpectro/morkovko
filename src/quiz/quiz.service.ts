@@ -14,7 +14,7 @@ import {
   capitalize,
   abbreviateNumber,
 } from './../morkovko/commands/helpers';
-import random from 'random';
+import random from 'src/helpers/random';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -144,7 +144,7 @@ export class QuizService {
       );
       embed.setFooter({ text: `${id}/10` });
 
-      const values = data.values.sort(() => 0.5 - random.float(0, 1));
+      const values = data.values.sort(() => 0.5 - random.float());
       const row = new ActionRowBuilder();
       const fund: FundDTO = await this.fundRepository.findOne({
         where: {
@@ -401,7 +401,7 @@ export class QuizService {
           const fillUnRightAnswers = (rightAnswer, array) => {
             return array
               .filter((f) => f.label !== rightAnswer)
-              .sort(() => 0.5 - random.float(0, 1))
+              .sort(() => 0.5 - random.float())
               .slice(0, 3)
               .map((m) => {
                 m.isRight = false;
@@ -423,7 +423,7 @@ export class QuizService {
             .filter(
               (f) => !f.label || f.values.filter((v) => !v.label).length < 4,
             )
-            .sort(() => 0.5 - random.float(0, 1))
+            .sort(() => 0.5 - random.float())
             .map((m) => {
               m.values = m.values.map((v) => {
                 v.id = idNum;

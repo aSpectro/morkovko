@@ -1,5 +1,5 @@
 import { EmbedBuilder } from 'discord.js';
-import random from 'random';
+import random from 'src/helpers/random';
 import { PlayerDTO } from 'src/dto/player.dto';
 import { heroesMap } from './../../helpers/heroes';
 
@@ -85,7 +85,7 @@ export function calcTime(n, f, t, p) {
 }
 
 export function randomIntFromInterval(min, max) {
-  return Math.floor(random.float(0, 1) * (max - min + 1) + min);
+  return Math.floor(random.float() * (max - min + 1) + min);
 }
 
 export function calcPrice(factor, price) {
@@ -102,7 +102,7 @@ export function getMaxSlots(carrotLevel) {
 }
 
 export function getChance() {
-  return random.float(0, 1) * 100;
+  return Math.random() * 100;
 }
 
 export function calcProgress(

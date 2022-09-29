@@ -1,6 +1,6 @@
 {
   "name": "morkovko",
-  "version": "0.2.59",
+  "version": "0.2.60",
   "description": "Discord бот - Nest.js, PostgreSQL, Discord.js",
   "author": "aSpectro",
   "private": true,
@@ -37,7 +37,6 @@
     "moment": "^2.29.4",
     "nestjs-redis": "github:skunight/nestjs-redis",
     "pg": "^8.7.3",
-    "random": "^3.0.6",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",

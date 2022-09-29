@@ -7,7 +7,7 @@ import { PlayerDTO } from '../../dto/player.dto';
 import { WarsService } from './../../wars.service';
 import { BonusType, Currency } from './../../enums';
 import { Hero } from './../../helpers/heroes';
-import random from 'random';
+import random from 'src/helpers/random';
 
 export default class Command {
   public commandName: string;
@@ -225,7 +225,7 @@ export default class Command {
 
   public async createBoss(player: PlayerDTO) {
     const bonuses = config.bot.wars.bonuses;
-    const bonus = bonuses[Math.floor(random.float(0, 1) * bonuses.length)]
+    const bonus = bonuses[Math.floor(random.float() * bonuses.length)]
     player.wars.bossBonus = {
       type: bonus[0] as BonusType,
       size: bonus[1] as number

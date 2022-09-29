@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { createCanvas, loadImage } from 'canvas';
-import random from 'random';
+import random from 'src/helpers/random';
 
 const imageFormat = {
   width: 256,
@@ -48,7 +48,7 @@ export class NFTService {
 
       for (let n = 0; n < combinations.length; n++) {
         const randomBackground =
-          backgrounds[Math.floor(random.float(0, 1) * backgrounds.length)];
+          backgrounds[Math.floor(random.float() * backgrounds.length)];
         await drawImage(combinations[n], randomBackground, n);
       }
     };
