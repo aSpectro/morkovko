@@ -33,6 +33,7 @@ export class SellCommand extends Command {
           const grabPercent = player.slotsCount >= 50 ? 15 : 5;
           let grab = false;
           if (grabChance <= grabPercent) grab = true;
+          if (!player.config?.fair?.isActive) grab = false;
           let count: any = this.getArgAll('кол-во');
           count = count === 'all' ? player.carrotCount : count;
           if (count && player.carrotCount >= count) {
@@ -52,7 +53,7 @@ export class SellCommand extends Command {
 
             service.savePlayer(player).then(async (resSave) => {
               if (resSave.status === 200) {
-                if (grab && player.config?.fair?.isActive) {
+                if (grab) {
                   const neighbours = await this.service.getUserNeighbours(
                     user.id,
                   );
