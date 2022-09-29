@@ -20,11 +20,12 @@ export class UpgradeCommand extends Command {
   ) {
     this.initCommand(message, args, service, isSlash, () => {
       const user = this.getUser();
-      service.checkUser(user.id).then((res) => {
+      service.checkUser(user.id).then(async (res) => {
         if (res.status === 200) {
           const player = res.player;
           let count: any = this.getArgAll('кол-во');
-          count = count === 'all' ? this.getMaxAllCount(player, true) : count;
+          count =
+            count === 'all' ? await this.getMaxAllCount(player, true) : count;
           const price = this.getAllPrice(player, count, true);
           if (count && player.points >= price) {
             player.carrotSize += count;

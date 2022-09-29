@@ -8,6 +8,8 @@ import { WarsService } from './../../wars.service';
 import { BonusType, Currency } from './../../enums';
 import { Hero } from './../../helpers/heroes';
 import random from 'src/helpers/random';
+import { callbackify } from 'util';
+import { resolve } from 'path';
 
 export default class Command {
   public commandName: string;
@@ -242,26 +244,29 @@ export default class Command {
     return await this.service.savePlayer(player);
   }
 
-  public getMaxAllCount(player: PlayerDTO, isUpgrade?: boolean): number {
-    let res = 0;
-    let slots = player.slotsCount;
-    let points = player.points;
-    const max = 100000;
-    const calc = () => {
-      const price = this.getPrice(slots, config.bot.economy.upgrade);
-      points -= price;
-      if (points >= 0 && res < max) {
-        res += 1;
-        if (isUpgrade) {
-          slots += 1;
+  public getMaxAllCount(player: PlayerDTO, isUpgrade?: boolean): Promise<number> {
+    return new Promise((resolve) => {
+      let res = 0;
+      let slots = player.slotsCount;
+      let points = player.points;
+      const max = 1000000;
+      const calc = () => {
+        const price = this.getPrice(slots, config.bot.economy.upgrade);
+        points -= price;
+        if (points >= 0 && res < max) {
+          res += 1;
+          if (isUpgrade) {
+            slots += 1;
+          }
+          setTimeout(() => {
+            calc();
+          }, 0);
+        } else {
+          resolve(res);
         }
-        setTimeout(() => {
-          calc();
-        }, 0);
       }
-    }
-    calc();
-    return res;
+      calc();
+    });
   }
 
   public getAllPrice(player: PlayerDTO, count: number, isUpgrade?: boolean): number {
