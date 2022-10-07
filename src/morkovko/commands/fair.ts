@@ -30,7 +30,7 @@ export class FairCommand extends Command {
               isActive: true,
               startDate: moment(new Date()).toDate(),
               reward: {
-                stars: 100,
+                stars: 50,
                 carrots: 100000,
                 exp: 5000,
               },

@@ -56,6 +56,20 @@ export class InfoCommand extends Command {
           let watering = '';
           let pray = '';
           let adate = '';
+          let fair = '🎃 Ты не участвуешь в ярмарке!';
+
+          if (player.config?.fair?.isActive) {
+            const d1Fair = moment(player.config.fair.startDate);
+            const d2Fair = moment(new Date());
+            const diffFair = d2Fair.diff(d1Fair, 'minutes');
+            const needDiffFair = 1440;
+
+            if (diffFair < needDiffFair) {
+              fair = `🎃 Ты вернешься с ярмарки через ${getTimeFromMins(
+                needDiffFair - diffFair,
+              )}\n`;
+            }
+          }
 
           if (diff >= needDiff) {
             watering = '💧 Полив морковки доступен.\n';
@@ -97,7 +111,7 @@ export class InfoCommand extends Command {
           }
 
           this.embed.setDescription(
-            `${gameTime + watering + pray + adate + exit}`,
+            `${gameTime + watering + pray + adate + fair + exit}`,
           );
           this.send({ embeds: [setEmbedAuthor(this.embed, user)] });
         } else {

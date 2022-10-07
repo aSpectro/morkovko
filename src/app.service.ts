@@ -63,7 +63,7 @@ export class AppService {
           const d1 = moment(player.config.fair.startDate);
           const d2 = moment(new Date());
           const diff = d2.diff(d1, 'minutes');
-          const needDiff = 4320; // 3 days
+          const needDiff = 1440; // 1 day
           if (diff >= needDiff) {
             const stars = player.config.fair.reward?.stars;
             const carrots = player.config.fair.reward?.carrots;
