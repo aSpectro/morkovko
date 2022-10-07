@@ -56,7 +56,7 @@ export class InfoCommand extends Command {
           let watering = '';
           let pray = '';
           let adate = '';
-          let fair = '🎃 Ты не участвуешь в ярмарке!';
+          let fair = '🎃 Ты не участвуешь в ярмарке!\n';
 
           if (player.config?.fair?.isActive) {
             const d1Fair = moment(player.config.fair.startDate);
