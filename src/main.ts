@@ -3,6 +3,8 @@ import {
   Collection,
   ActivityType,
   GatewayIntentBits,
+  EmbedBuilder,
+  ColorResolvable,
 } from 'discord.js';
 import random from 'src/helpers/random';
 import { NestFactory } from '@nestjs/core';
@@ -125,6 +127,15 @@ async function MorkovkoApp() {
         } catch (err) {
           //
         }
+      } else {
+        const embed = new EmbedBuilder().setColor(
+          config.bot.badgeColor as ColorResolvable,
+        );
+        embed.setDescription('Такой команды нет! **!помощь**');
+        embed.setImage(
+          'https://media.discordapp.net/attachments/830089040991748106/959815199995621426/fuck2.gif',
+        );
+        await message.reply({ embeds: [embed] });
       }
     });
 
