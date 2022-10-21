@@ -32,6 +32,7 @@ export interface Config {
     startDate: Date;
     reward: Reward;
   };
+  promocodes?: string[];
   autoBuyPugalo: boolean;
   slotSpeedUpdate: number;
   cooldowns: {
@@ -55,6 +56,7 @@ export interface PlayerDTO {
   points: number;
   carrotSize: number;
   carrotAvatar: string;
+  pumpkinAvatar: string;
   lastWateringDate: Date;
   lastPrayDate: Date;
   lastADate: Date;
@@ -75,6 +77,7 @@ export interface PlayerDTO {
 export interface PlayerReqDTO {
   userId: string;
   carrotAvatar?: string;
+  pumpkinAvatar?: string;
   lastWateringDate?: Date;
   lastPrayDate?: Date;
   lastADate?: Date;

@@ -2,6 +2,7 @@ import Command from './Command';
 import { setEmbedAuthor } from './helpers';
 import { AppService } from './../../app.service';
 import { WarsService } from 'src/wars.service';
+import { Mutations } from './../../enums';
 
 export class StartCommand extends Command {
   constructor(
@@ -22,7 +23,8 @@ export class StartCommand extends Command {
       const user = this.getUser();
       const player = {
         userId: user.id,
-        carrotAvatar: this.getRandomAvatar(),
+        carrotAvatar: this.getRandomAvatar(Mutations.carrot),
+        pumpkinAvatar: this.getRandomAvatar(Mutations.pumpkin),
       };
       service.createPlayer(player).then((res) => {
         if (res.status === 200) {

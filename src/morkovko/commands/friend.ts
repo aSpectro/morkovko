@@ -72,7 +72,7 @@ export class FriendCommand extends Command {
                   this.embed.setDescription(
                     `**${
                       userMention.username
-                    }**\nРазмер морковки **${abbreviateNumber(
+                    }**\nРазмер ${this.locale.getEnum('морковки')} **${abbreviateNumber(
                       playerMention.carrotSize,
                     )}** см.\n${pugalo}\n${relations}\n
                     Соседи: ${neighboursString}`,

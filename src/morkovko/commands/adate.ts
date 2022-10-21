@@ -79,11 +79,11 @@ export class AdateCommand extends Command {
                           let friendNoCarrot = '';
                           if (player.carrotCount < 0) {
                             noCarrot =
-                              ' т.к. у тебя не было морковки, ты взял кредит,';
+                              ` т.к. у тебя не было ${this.locale.getCurrency()}, ты взял кредит,`;
                           }
                           if (friendModel.carrotCount < 0) {
                             friendNoCarrot =
-                              'У твоего друга не было морковки, он взял кредит.';
+                              `У твоего друга не было ${this.locale.getCurrency()}, он взял кредит.`;
                           }
 
                           let result = '';
@@ -99,7 +99,7 @@ export class AdateCommand extends Command {
                               friendModel.userId
                             }>, ${
                               !isSuccess
-                                ? `вы потеряли по ${this.config.economy.adateFail} 🥕,`
+                                ? `вы потеряли по ${this.config.economy.adateFail} ${this.locale.getCurrency()},`
                                 : ''
                             }${!isSuccess ? noCarrot : ''} ${result} ${
                               !isSuccess ? friendNoCarrot : ''

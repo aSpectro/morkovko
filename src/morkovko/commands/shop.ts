@@ -39,7 +39,7 @@ export class ShopCommand extends Command {
           const carrotLevel = getCarrotLevel(player.carrotSize);
           const maxSlots = getMaxSlots(carrotLevel);
           const playerSlots = player.slotsCount;
-          this.embed.setDescription(`Морковок: **🥕 ${abbreviateNumber(
+          this.embed.setDescription(`${this.locale.getEnum('морковок', true)}: **${this.locale.getCurrency()} ${abbreviateNumber(
             player.carrotCount,
           )}**\n
           Очков улучшений: **🔸 ${abbreviateNumber(player.points)}**`);
@@ -47,7 +47,7 @@ export class ShopCommand extends Command {
           this.embed.addFields(
             {
               name: '!продать',
-              value: `Продать морковки за 🔸. **!продать <кол-во>**`,
+              value: `Продать ${this.locale.getEnum('морковки')} за 🔸. **!продать <кол-во>**`,
               inline: true,
             },
             {
@@ -61,7 +61,7 @@ export class ShopCommand extends Command {
             },
             {
               name: '!увеличить',
-              value: `Увеличить конкурсную морковку за **${abbreviateNumber(
+              value: `Увеличить конкурсную ${this.locale.getEnum('морковку')} за **${abbreviateNumber(
                 this.getPrice(playerSlots, upgrade),
               )}🔸** на 1см. **!увеличить <кол-во>**`,
               inline: true,
@@ -86,7 +86,7 @@ export class ShopCommand extends Command {
           ) {
             this.embed.addFields({
               name: '!скорость-роста',
-              value: `Увеличить скорость роста морковок на **1%** за ${abbreviateNumber(
+              value: `Увеличить скорость роста ${this.locale.getEnum('морковок')} на **1%** за ${abbreviateNumber(
                 this.getPrice(playerSlots, slotSpeedUpdate),
               )} 🔸.`,
               inline: true,

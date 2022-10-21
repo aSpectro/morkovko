@@ -32,7 +32,7 @@ export class GRCommand extends Command {
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Ты увеличил бонус скорости роста морковки в горшках. Текущий бонус **${player.config.slotSpeedUpdate}%**`,
+                  `Ты увеличил бонус скорости роста ${this.locale.getEnum('морковки')} в горшках. Текущий бонус **${player.config.slotSpeedUpdate}%**`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
@@ -56,7 +56,7 @@ export class GRCommand extends Command {
                   `Ты не можешь купить этот бонус! Сейчас у тебя ${player.config.slotSpeedUpdate}/50.`,
                 );
               } else if (player.carrotSize < this.config.bot.economy.shopRules['slotSpeedUpdate']) {
-                this.embed.setDescription(`Твоя морковка слишком маленькая!`);
+                this.embed.setDescription(`Твоя ${this.locale.getEnum('морковка')} слишком маленькая!`);
               } else {
                 this.embed.setDescription(
                   `Ты можешь купить не больше ${acceptedCount} бонусов! Сейчас у тебя ${player.config.slotSpeedUpdate}/50.`,

@@ -1,6 +1,6 @@
 {
   "name": "morkovko",
-  "version": "0.2.69",
+  "version": "0.2.70",
   "description": "Discord бот - Nest.js, PostgreSQL, Discord.js",
   "author": "aSpectro",
   "private": true,
@@ -10,6 +10,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
+    "start:mutator": "MUTATOR=mutator nest start",
     "start:dev": "NODE_ENV=dev nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "NODE_ENV=prod node dist/main",

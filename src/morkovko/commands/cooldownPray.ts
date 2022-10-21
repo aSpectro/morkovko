@@ -56,7 +56,7 @@ export class CPCommand extends Command {
                   `Ты не можешь купить этот бонус! Сейчас у тебя ${player.config.cooldowns.pray}/50.`,
                 );
               } else if (player.carrotSize < this.config.bot.economy.shopRules['cooldowns']) {
-                this.embed.setDescription(`Твоя морковка слишком маленькая!`);
+                this.embed.setDescription(`Твоя ${this.locale.getEnum('морковка')} слишком маленькая!`);
               } else {
                 this.embed.setDescription(
                   `Ты можешь купить не больше ${acceptedCount} бонусов! Сейчас у тебя ${player.config.cooldowns.pray}/50.`,

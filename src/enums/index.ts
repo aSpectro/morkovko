@@ -22,3 +22,8 @@ export enum BonusType {
   fury = 'fury',
   dawn = 'dawn',
 }
+
+export enum Mutations {
+  carrot = 'carrot',
+  pumpkin = 'pumpkin'
+}

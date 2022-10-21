@@ -50,7 +50,7 @@ export class ABPCommand extends Command {
               this.embed.setDescription(`У тебя уже есть бонус!`);
             } else if (!this.canBuy(player.carrotSize, 'autoBuyPugalo', 1)) {
               this.embed.setDescription(
-                `Ты не можешь купить этот бонус, твоя морковка слишком маленькая!`,
+                `Ты не можешь купить этот бонус, твоя ${this.locale.getEnum('морковка')} слишком маленькая!`,
               );
             } else {
               this.embed.setDescription(

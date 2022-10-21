@@ -30,7 +30,7 @@ export class StatsCommand extends Command {
             const playersCount = `Всего игроков: ${abbreviateNumber(
               statsRes.stats.playersCount,
             )}\n`;
-            const allCarrotsCount = `Морковок в игре: ${abbreviateNumber(
+            const allCarrotsCount = `${this.locale.getEnum('морковок', true)} в игре: ${abbreviateNumber(
               statsRes.stats.allCarrotsCount,
             )}\n`;
             this.embed.setDescription(

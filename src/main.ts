@@ -13,8 +13,8 @@ import { registerSlashCommands } from './morkovko/commands/slashCommands';
 import { AppService } from './app.service';
 import { WarsService } from './wars.service';
 import { AppModule } from './app.module';
-import { NFTService } from './nft/nft.service';
-import { NFTModule } from './nft/nft.module';
+import { MutatorService } from './mutator/mutator.service';
+import { MutatorModule } from './mutator/mutator.module';
 import { QuizService } from './quiz/quiz.service';
 import { QuizModule } from './quiz/quiz.module';
 
@@ -144,12 +144,17 @@ async function MorkovkoApp() {
     console.log(error);
   }
 }
-MorkovkoApp();
 
-async function MorkovkoNFT() {
-  const app = await NestFactory.create(NFTModule);
+async function MorkovkoMutator() {
+  const app = await NestFactory.create(MutatorModule);
   await app.listen(8112);
-  const service = app.get<NFTService>(NFTService);
-  service.createImages();
+  const service = app.get<MutatorService>(MutatorService);
+  await service.mutate();
+  await service.updateUsers();
 }
-// MorkovkoNFT();
+
+if (config.isMutatorMode) {
+  MorkovkoMutator();
+} else {
+  MorkovkoApp();
+}

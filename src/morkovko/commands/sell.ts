@@ -41,8 +41,8 @@ export class SellCommand extends Command {
             player.carrotCount -= count;
             const grabCount = grab ? Math.floor(count / 2) : count;
             player.points += grab
-              ? count - (grabCount === 0 ? 1 : grabCount)
-              : count;
+              ? (count - (grabCount === 0 ? 1 : grabCount)) * this.locale.getBonus(player.config?.fair?.isActive)
+              : count * this.locale.getBonus(player.config?.fair?.isActive);
 
             const fundRes = await service.getActiveFund();
             if (fundRes.status === 200 && grab) {
@@ -72,9 +72,9 @@ export class SellCommand extends Command {
                         neighbour.userId
                       }> и сдал тебя налоговой, у тебя изъяли ${
                         grabCount === 0 ? 1 : abbreviateNumber(grabCount)
-                      }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${abbreviateNumber(
+                      } ${this.locale.getCurrency()} в счет фонда борьбы с моррупцией. Ты смог продать ${abbreviateNumber(
                         count - grabCount,
-                      )}🥕. Теперь у тебя на счету ${abbreviateNumber(
+                      )} ${this.locale.getCurrency()}. Теперь у тебя на счету ${abbreviateNumber(
                         player.points,
                       )}🔸`,
                     );
@@ -82,9 +82,9 @@ export class SellCommand extends Command {
                     this.embed.setDescription(
                       `Во время продажи тебя кто-то увидел и позвонил в налоговую, у тебя изъяли ${
                         grabCount === 0 ? 1 : abbreviateNumber(grabCount)
-                      }🥕 в счет фонда борьбы с моррупцией. Ты смог продать ${abbreviateNumber(
+                      } ${this.locale.getCurrency()} в счет фонда борьбы с моррупцией. Ты смог продать ${abbreviateNumber(
                         count - grabCount,
-                      )}🥕. Теперь у тебя на счету ${abbreviateNumber(
+                      )} ${this.locale.getCurrency()}. Теперь у тебя на счету ${abbreviateNumber(
                         player.points,
                       )}🔸`,
                     );
@@ -93,7 +93,7 @@ export class SellCommand extends Command {
                   this.embed.setDescription(
                     `Ты продал ${abbreviateNumber(
                       count,
-                    )}🥕. Теперь у тебя на счету ${abbreviateNumber(
+                    )} ${this.locale.getCurrency()}. Теперь у тебя на счету ${abbreviateNumber(
                       player.points,
                     )}🔸`,
                   );
@@ -103,7 +103,7 @@ export class SellCommand extends Command {
                 });
               } else {
                 this.embed.setDescription(
-                  `Не получилось продать 🥕. Попробуй позже.`,
+                  `Не получилось продать ${this.locale.getCurrency()}. Попробуй позже.`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
@@ -112,12 +112,12 @@ export class SellCommand extends Command {
             });
           } else {
             if (!count) {
-              this.embed.setDescription(`Ты не указал кол-во 🥕!`);
+              this.embed.setDescription(`Ты не указал кол-во ${this.locale.getCurrency()}!`);
             } else {
               this.embed.setDescription(
                 `Тебе не хватает ${abbreviateNumber(
                   count - player.carrotCount,
-                )}🥕!`,
+                )}${this.locale.getCurrency()}!`,
               );
             }
             this.send({

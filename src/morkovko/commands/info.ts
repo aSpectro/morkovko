@@ -56,7 +56,14 @@ export class InfoCommand extends Command {
           let watering = '';
           let pray = '';
           let adate = '';
-          let fair = '🎃 Ты не участвуешь в ярмарке!\n';
+          let fair = '🏕 Ты не участвуешь в ярмарке!\n';
+          let eventBonus = '';
+          if (this.locale.name === 'halloween') {
+            eventBonus = `Событие **HALLOWEEN**, действует бонус за продажу 🎃 **x${this.locale.getBonus(true)}** на ярмарке!\n`
+          }
+          if (this.locale.name === 'new_year') {
+            eventBonus = `Событие **Новый год**, действует бонус за продажу 🌲 **x${this.locale.getBonus(true)}** на ярмарке!\n`
+          }
 
           if (player.config?.fair?.isActive) {
             const d1Fair = moment(player.config.fair.startDate);
@@ -65,16 +72,16 @@ export class InfoCommand extends Command {
             const needDiffFair = 1440;
 
             if (diffFair < needDiffFair) {
-              fair = `🎃 Ты вернешься с ярмарки через ${getTimeFromMins(
+              fair = `🏕 Ты вернешься с ярмарки через ${getTimeFromMins(
                 needDiffFair - diffFair,
               )}\n`;
             }
           }
 
           if (diff >= needDiff) {
-            watering = '💧 Полив морковки доступен.\n';
+            watering = `💧 Полив ${this.locale.getEnum('морковки')} доступен.\n`;
           } else {
-            watering = `💧 Ты сможешь полить морковку не раньше чем через ${getTimeFromMins(
+            watering = `💧 Ты сможешь полить ${this.locale.getEnum('морковку')} не раньше чем через ${getTimeFromMins(
               needDiff - diff,
             )}\n`;
           }
@@ -105,13 +112,13 @@ export class InfoCommand extends Command {
           ) {
             exit = `Можно выкти и получить бонусы!`;
           } else {
-            exit = `Чтобы выкти, нужно вырастить морковку еще на **${abbreviateNumber(
+            exit = `Чтобы выкти, нужно вырастить ${this.locale.getEnum('морковку')} еще на **${abbreviateNumber(
               this.getExitCarrotSize(player.progressBonus) - player.carrotSize,
             )}см**`;
           }
 
           this.embed.setDescription(
-            `${gameTime + watering + pray + adate + fair + exit}`,
+            `${gameTime + eventBonus + watering + pray + adate + fair + exit}`,
           );
           this.send({ embeds: [setEmbedAuthor(this.embed, user)] });
         } else {

@@ -44,7 +44,7 @@ export class DonateCommand extends Command {
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Ты пожертвовал **${abbreviateNumber(count)}** 🥕.`,
+                  `Ты пожертвовал **${abbreviateNumber(count)}** ${this.locale.getCurrency()}.`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
@@ -53,20 +53,20 @@ export class DonateCommand extends Command {
             });
           } else {
             if (!count) {
-              this.embed.setDescription(`Ты не указал кол-во 🥕!`);
+              this.embed.setDescription(`Ты не указал кол-во ${this.locale.getCurrency()}!`);
             } else if (count > maxDonate) {
               this.embed.setDescription(
                 `В день можно пожертвовать максимум **${abbreviateNumber(
                   maxDonate,
-                )}**🥕 и только один раз!`,
+                )}**${this.locale.getCurrency()} и только один раз!`,
               );
             } else if (player.config.isDonateToday) {
-              this.embed.setDescription(`Сегодня ты уже пожертвовал 🥕!`);
+              this.embed.setDescription(`Сегодня ты уже пожертвовал ${this.locale.getCurrency()}!`);
             } else {
               this.embed.setDescription(
                 `Тебе не хватает ${abbreviateNumber(
                   count - player.carrotCount,
-                )}🥕!`,
+                )}${this.locale.getCurrency()}!`,
               );
             }
             this.send({

@@ -33,7 +33,7 @@ export class HeroesShopCommand extends Command {
             for (const hero of Object.entries(heroesMap)) {
               const price =
                 hero[1]().type === HeroType.normal
-                  ? `${abbreviateNumber(hero[1]().price)} 🥕`
+                  ? `${abbreviateNumber(hero[1]().price)} ${this.locale.getCurrency()}`
                   : `${abbreviateNumber(hero[1]().price)} ⭐`;
               const bonus = hero[1]().bonus
                 ? `${hero[1]().getBonusDescription()}`

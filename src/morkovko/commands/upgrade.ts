@@ -2,6 +2,7 @@ import Command from './Command';
 import { setEmbedAuthor, abbreviateNumber } from './helpers';
 import { AppService } from './../../app.service';
 import { WarsService } from 'src/wars.service';
+import { Mutations } from './../../enums';
 
 export class UpgradeCommand extends Command {
   constructor(
@@ -33,11 +34,12 @@ export class UpgradeCommand extends Command {
               player.carrotSize += Math.floor(count / 5);
             }
             player.points -= price;
-            player.carrotAvatar = this.getRandomAvatar();
+            player.carrotAvatar = this.getRandomAvatar(Mutations.carrot);
+            player.pumpkinAvatar = this.getRandomAvatar(Mutations.pumpkin);
             service.savePlayer(player).then((resSave) => {
               if (resSave.status === 200) {
                 this.embed.setDescription(
-                  `Ты увеличил конкурсную морковку. Теперь ее размер **${abbreviateNumber(
+                  `Ты увеличил конкурсную ${this.locale.getEnum('морковку')}. Теперь ее размер **${abbreviateNumber(
                     player.carrotSize,
                   )}** см! Возможно она мутировала.`,
                 );
@@ -46,7 +48,7 @@ export class UpgradeCommand extends Command {
                 });
               } else {
                 this.embed.setDescription(
-                  `Не получилось увеличить конкурсную морковку. Попробуй позже.`,
+                  `Не получилось увеличить конкурсную ${this.locale.getEnum('морковку')}. Попробуй позже.`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],

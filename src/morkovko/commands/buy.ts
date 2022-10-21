@@ -73,7 +73,7 @@ export class BuyCommand extends Command {
               this.embed.setDescription(
                 `Ты не можешь купить ${abbreviateNumber(
                   count,
-                )} 🧺! Увеличивай конкурсную морковку, сейчас твой лимит **${abbreviateNumber(
+                )} 🧺! Увеличивай конкурсную ${this.locale.getEnum('морковку')}, сейчас твой лимит **${abbreviateNumber(
                   playerSlots,
                 )}/${abbreviateNumber(maxSlots)}** 🧺`,
               );

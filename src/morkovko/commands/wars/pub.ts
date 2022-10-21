@@ -41,7 +41,7 @@ export class PubCommand extends Command {
               )}/${abbreviateNumber(hero.getNeedUpgradeExp(1))}** ⚪`;
               const upgradePrice = `Стоимость улучшения: **${abbreviateNumber(
                 hero.getUpgradePrice(1),
-              )}** 🥕`;
+              )}** ${this.locale.getCurrency()}`;
               const bonus = hero.bonus ? `${hero.getBonusDescription()}\n` : '';
               const stats = `Уровень ${abbreviateNumber(
                 hero.level,

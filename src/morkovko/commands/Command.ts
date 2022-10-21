@@ -1,15 +1,16 @@
 import { EmbedBuilder, ColorResolvable } from 'discord.js';
+import * as fs from 'fs';
 import { noUserEmbed, randomIntFromInterval, setEmbedAuthor, abbreviateNumber } from './helpers';
 import config from '../config';
 import { AppService } from './../../app.service';
 import { LogDTO } from '../../dto/log.dto';
 import { PlayerDTO } from '../../dto/player.dto';
 import { WarsService } from './../../wars.service';
-import { BonusType, Currency } from './../../enums';
+import { BonusType, Currency, Mutations } from './../../enums';
 import { Hero } from './../../helpers/heroes';
 import random from 'src/helpers/random';
-import { callbackify } from 'util';
-import { resolve } from 'path';
+import locale from 'src/modes';
+import { Locale } from 'src/modes/locale';
 
 export default class Command {
   public commandName: string;
@@ -20,6 +21,7 @@ export default class Command {
   public embed: EmbedBuilder;
   public wars: WarsService;
   public config;
+  public locale: Locale = locale;
   private errors: string[] = [];
   private needEvents: boolean;
 
@@ -122,9 +124,10 @@ export default class Command {
       : this.message.mentions.users.first();
   }
 
-  public getRandomAvatar() {
-    const carrotNum = randomIntFromInterval(1, this.config.bot.carrotsLimit);
-    return `./outputs/carrots/${carrotNum}.png`;
+  public getRandomAvatar(mutation: Mutations) {
+    const num = randomIntFromInterval(1, fs.readdirSync(`./outputs/${mutation}`).length);
+    const veg = mutation;
+    return `./outputs/${veg}/${num}.png`;
   }
 
   public resetPlayer(player: PlayerDTO) {
@@ -196,7 +199,7 @@ export default class Command {
       isHas = false;
       error = `Тебе не хватает **${abbreviateNumber(
         price - player.carrotCount,
-      )}** 🥕!`;
+      )}** ${this.locale.getCurrency()}!`;
     } else if (currency === Currency.stars && player.stars < price) {
       isHas = false;
       error = `Тебе не хватает **${abbreviateNumber(

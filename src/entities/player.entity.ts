@@ -71,6 +71,9 @@ export class PlayerEntity {
   @Column({ type: 'varchar', length: 200, default: './outputs/carrots/1.png' })
   carrotAvatar: string;
 
+  @Column({ type: 'varchar', length: 200, default: './outputs/pumpkin/1.png' })
+  pumpkinAvatar: string;
+
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   lastWateringDate: Date;
 

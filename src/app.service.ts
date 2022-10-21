@@ -9,6 +9,7 @@ import {
   findNeighbours,
   abbreviateNumber,
 } from './morkovko/commands/helpers';
+import locale from 'src/modes';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
@@ -69,8 +70,8 @@ export class AppService {
             const carrots = player.config.fair.reward?.carrots;
             const exp = player.config.fair.reward?.exp;
             if (stars) player.stars += stars;
-            if (carrots) player.carrotCount += carrots;
-            if (exp) expBonus = exp;
+            if (carrots) player.carrotCount += carrots * player.progressBonus;
+            if (exp) expBonus = exp * player.progressBonus;
             player.config.fair.isActive = false;
             player.config.fair.reward = {};
             idsFairEnd.push(player.userId);
@@ -152,7 +153,7 @@ export class AppService {
         embed.setDescription(
           `Внимание фермеры!\nВ нашем районе активизировалась **Морковная Мафия**!\n
           ${playersMentions} были подвержены нападению, **Морковная Мафия** изъяла у них половину 🧺!\n
-          Так же они выпустили на их фермы **колорадских жуков** 🐛, они пожрали **25%** урожая и отгрызли **5%** от длины конкурсных морковок.`,
+          Так же они выпустили на их фермы **колорадских жуков** 🐛, они пожрали **25%** урожая и отгрызли **5%** от ${locale.getEnum('длины')} конкурсных ${locale.getEnum('морковок')}.`,
         );
       } else {
         embed.setDescription(
@@ -340,7 +341,7 @@ export class AppService {
         embed.setDescription(
           `**В эфире криминальные новости!**\n
           Департамент региональной безопасности и противодействия моррупции Морковного края провел спец. операцию по противодействию моррупции по добыче и сбыту морковки. В ходе операции был задержан и оштрафован <@${userId}>.\n
-          Молиция оштрафовала его на **${abbreviateNumber(price)}** 🥕!\n
+          Молиция оштрафовала его на **${abbreviateNumber(price)}** ${locale.getCurrency()}!\n
           Граждане фермеры, наш департамент благодарит всех законопослушных граждан и желает им хорошего урожая!`,
         );
 

@@ -27,7 +27,11 @@ export class CarrotCommand extends Command {
           const player = res.player;
           const canvas = createCanvas(256, 256);
           const ctx = canvas.getContext('2d');
-          const carrot = await loadImage(player.carrotAvatar);
+          let mutation = player.carrotAvatar;
+          if (this.locale.name === 'halloween') {
+            mutation = player.pumpkinAvatar;
+          }
+          const carrot = await loadImage(mutation);
           ctx.drawImage(carrot, 0, 0, 256, 256);
           const attachment = new AttachmentBuilder(
             canvas.toBuffer('image/png'),
@@ -38,7 +42,7 @@ export class CarrotCommand extends Command {
 
           if (carrot) {
             this.embed.setDescription(
-              `Размер морковки **${abbreviateNumber(player.carrotSize)}** см`,
+              `Размер ${this.locale.getEnum('морковки')} **${abbreviateNumber(player.carrotSize)}** см`,
             );
             this.send({
               embeds: [setEmbedAuthor(this.embed, user)],

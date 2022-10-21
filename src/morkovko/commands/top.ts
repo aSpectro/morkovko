@@ -32,7 +32,7 @@ export class TopCommand extends Command {
               this.embed.setDescription(
                 `Твое место в рейтинге **${
                   userRate + 1
-                }**! Размер морковки **${abbreviateNumber(
+                }**! Размер ${this.locale.getEnum('морковки')} **${abbreviateNumber(
                   player.carrotSize,
                 )}** см`,
               );
@@ -53,7 +53,7 @@ export class TopCommand extends Command {
                   };
                   this.embed.addFields({
                     name: `${i + 1}. ${field.nickname}`,
-                    value: `Размер морковки **${abbreviateNumber(
+                    value: `Размер ${this.locale.getEnum('морковки')} **${abbreviateNumber(
                       field.size,
                     )}** см`,
                   });

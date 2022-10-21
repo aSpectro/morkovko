@@ -53,8 +53,8 @@ export class InventoryCommand extends Command {
           }/3**\nДебафы: **${debuffs ? debuffs : 0}**`);
           this.embed.addFields(
             {
-              name: 'Морковок',
-              value: `🥕 ${abbreviateNumber(player.carrotCount)}`,
+              name: `${this.locale.getEnum('морковок', true)}`,
+              value: `${this.locale.getCurrency()} ${abbreviateNumber(player.carrotCount)}`,
               inline: true,
             },
             {

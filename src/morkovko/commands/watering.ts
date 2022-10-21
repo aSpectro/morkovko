@@ -39,13 +39,13 @@ export class WateringCommand extends Command {
           if (diff >= needDiff) {
             service.watering(res.player).then((resWatering) => {
               if (resWatering.status === 200) {
-                this.embed.setDescription(`Морковка полита!`);
+                this.embed.setDescription(`${this.locale.getEnum('морковка', true)} полита!`);
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
                 });
               } else {
                 this.embed.setDescription(
-                  `Не получилось полить морковку, попробуй позже!`,
+                  `Не получилось полить ${this.locale.getEnum('морковку')}, попробуй позже!`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],
@@ -54,7 +54,7 @@ export class WateringCommand extends Command {
             });
           } else {
             this.embed.setDescription(
-              `Ты сможешь полить морковку не раньше чем через ${getTimeFromMins(
+              `Ты сможешь полить ${this.locale.getEnum('морковку')} не раньше чем через ${getTimeFromMins(
                 needDiff - diff,
               )}!`,
             );

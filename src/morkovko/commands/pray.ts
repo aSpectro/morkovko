@@ -49,7 +49,7 @@ export class PrayCommand extends Command {
                 this.embed.setDescription(
                   `Святая подарила тебе ${abbreviateNumber(
                     prayCarrots,
-                  )}🥕 за молитву!`,
+                  )}${this.locale.getCurrency()} за молитву!`,
                 );
                 this.send({
                   embeds: [setEmbedAuthor(this.embed, user)],

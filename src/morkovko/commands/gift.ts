@@ -100,7 +100,7 @@ export class GiftCommand extends Command {
                         this.embed.setDescription(
                           `Ты подарил <@${
                             playerMention.userId
-                          }> ${count}🥕. Ваш уровень отношений повышен до ${level} очков - **${getRelLevelName(
+                          }> ${count}${this.locale.getCurrency()}. Ваш уровень отношений повышен до ${level} очков - **${getRelLevelName(
                             level,
                           )}**`,
                         );
@@ -109,7 +109,7 @@ export class GiftCommand extends Command {
                         });
                       } else {
                         this.embed.setDescription(
-                          `Не получилось подарить 🥕. Попробуй позже.`,
+                          `Не получилось подарить ${this.locale.getCurrency()}. Попробуй позже.`,
                         );
                         this.send({
                           embeds: [setEmbedAuthor(this.embed, user)],
@@ -118,7 +118,7 @@ export class GiftCommand extends Command {
                     });
                   } else {
                     this.embed.setDescription(
-                      `Не получилось подарить 🥕. Попробуй позже.`,
+                      `Не получилось подарить ${this.locale.getCurrency()}. Попробуй позже.`,
                     );
                     this.send({
                       embeds: [setEmbedAuthor(this.embed, user)],
@@ -141,17 +141,17 @@ export class GiftCommand extends Command {
                 embeds: [setEmbedAuthor(this.embed, user)],
               });
             } else if (!count) {
-              this.embed.setDescription('Ты не указал кол-во 🥕!');
+              this.embed.setDescription(`Ты не указал кол-во ${this.locale.getCurrency()}!`);
               this.send({
                 embeds: [setEmbedAuthor(this.embed, user)],
               });
             } else if (userMention.id === user.id || userMention.bot) {
-              this.embed.setDescription('Нельзя подарить себе 🥕!');
+              this.embed.setDescription(`Нельзя подарить себе ${this.locale.getCurrency()}!`);
               this.send({
                 embeds: [setEmbedAuthor(this.embed, user)],
               });
             } else if (count > maxGiftCount) {
-              this.embed.setDescription('Нельзя подарить больше 10 🥕 за раз!');
+              this.embed.setDescription(`Нельзя подарить больше 10 ${this.locale.getCurrency()} за раз!`);
               this.send({
                 embeds: [setEmbedAuthor(this.embed, user)],
               });
@@ -163,7 +163,7 @@ export class GiftCommand extends Command {
                 embeds: [setEmbedAuthor(this.embed, user)],
               });
             } else {
-              this.embed.setDescription('У тебя не хватает 🥕!');
+              this.embed.setDescription(`У тебя не хватает ${this.locale.getCurrency()}!`);
               this.send({
                 embeds: [setEmbedAuthor(this.embed, user)],
               });

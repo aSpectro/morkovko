@@ -28,6 +28,7 @@ import { DungCommand } from './dung';
 import { DebufCommand } from './debuf';
 import { ThiefCommand } from './thief';
 import { FairCommand } from './fair';
+import { PromocodeCommand } from './promocode';
 
 //wars
 import { HeroesShopCommand } from './wars/heroesShop';
@@ -68,13 +69,14 @@ export function CommandList(wars: WarsService) {
     new CACommand('кулдаун-свидание', false),
     new CWCommand('кулдаун-полив', false),
     new CPCommand('кулдаун-молитва', false),
-    new DonateCommand('пожертвовать', true),
+    new DonateCommand('пожертвовать', false),
     new StatsCommand('статистика', false),
     new StarsCommand('звезды', true),
     new DungCommand('удобрение', true),
     new DebufCommand('дебаф', true),
     new ThiefCommand('вор', true),
     new FairCommand('ярмарка', false),
+    new PromocodeCommand('промокод', false),
     //wars
     new HeroesShopCommand('герои', true),
     new HeroCommand('герой', true),

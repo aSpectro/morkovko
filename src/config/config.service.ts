@@ -25,16 +25,16 @@ class ConfigService {
     return this.getValue('PORT', true);
   }
 
+  public getEvent() {
+    return this.getValue('EVENT', true);
+  }
+
   public getClientId() {
     return this.getValue('CLIENT_ID', true);
   }
 
   public getAdminId() {
     return this.getValue('ADMIN_BOT_ID', true);
-  }
-
-  public getCarrotsLimit() {
-    return this.getValue('BOT_IMAGES_COUNT', true);
   }
 
   public getMorkovkoChannel() {

@@ -10,6 +10,9 @@ commit:
 dev: install
 	yarn start:dev
 
+mutator: install
+	yarn start:mutator
+
 redis:
 	yarn redis
 

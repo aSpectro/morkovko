@@ -3,13 +3,13 @@ import { BonusType } from 'src/enums';
 
 export default {
   admin: configService.getAdminId(),
+  isMutatorMode: process.env.MUTATOR ? process.env.MUTATOR : false,
   bot: {
     token: configService.getToken(),
     prefix: configService.isProduction() ? '!' : '.', // префикс бота prod/dev
     rpc: '/ᐠ｡ꞈ｡ᐟ\\', // дефолтное значение RPC
     botId: configService.getClientId(),
     hourProgress: 100 / 24, // deprecated
-    carrotsLimit: configService.getCarrotsLimit(),
     clientId: configService.getClientId(),
     guildId: configService.geGuildId(),
     wars: {
