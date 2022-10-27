@@ -42,25 +42,25 @@ export class AppService {
     private fundRepository: Repository<FundEntity>,
   ) {}
 
-  @Cron('0 * * * * *')
-  async migrate() {
-    try {
-      const data: PlayerDTO[] = await this.playerRepository.find();
-      for (const player of data) {
-        player.carrotCount = player.carrotCountBig;
-        player.points = player.pointsBig;
-        player.stars = player.starsBig;
-        player.carrotSize = player.carrotSizeBig;
-        player.slotsCount = player.slotsCountBig;
-
-        this.savePlayer(player);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   // @Cron('0 * * * * *')
+  // async migrate() {
+  //   try {
+  //     const data: PlayerDTO[] = await this.playerRepository.find();
+  //     for (const player of data) {
+  //       player.carrotCount = player.carrotCountBig;
+  //       player.points = player.pointsBig;
+  //       player.stars = player.starsBig;
+  //       player.carrotSize = player.carrotSizeBig;
+  //       player.slotsCount = player.slotsCountBig;
+
+  //       this.savePlayer(player);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  @Cron('0 * * * * *')
   async gameTick() {
     try {
       const data: PlayerDTO[] = await this.playerRepository.find();

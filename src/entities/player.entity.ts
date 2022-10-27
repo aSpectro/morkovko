@@ -53,21 +53,6 @@ export class PlayerEntity {
   @Column({ type: 'bigint', nullable: false, default: 1 })
   slotsCount: number;
 
-  @Column({ type: 'bigint', nullable: false, default: 0 })
-  carrotCountBig: number;
-
-  @Column({ type: 'bigint', nullable: false, default: 0 })
-  pointsBig: number;
-
-  @Column({ type: 'bigint', nullable: false, default: 0 })
-  starsBig: number;
-
-  @Column({ type: 'bigint', nullable: false, default: 0 }) // todo def 1
-  carrotSizeBig: number;
-
-  @Column({ type: 'bigint', nullable: false, default: 0 }) // todo def 1
-  slotsCountBig: number;
-
   @Column({ type: 'int4', nullable: false, default: 1 })
   progressBonus: number;
 
