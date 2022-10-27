@@ -38,19 +38,19 @@ export class PlayerEntity {
   @Column({ type: 'varchar', length: 200, nullable: false, unique: true })
   userId: string;
 
-  @Column({ type: 'int4', nullable: false, default: 0 })
+  @Column({ type: 'bigint', nullable: false, default: 0 })
   carrotCount: number;
 
-  @Column({ type: 'int4', nullable: false, default: 0 })
+  @Column({ type: 'bigint', nullable: false, default: 0 })
   points: number;
 
-  @Column({ type: 'int4', nullable: false, default: 0 })
+  @Column({ type: 'bigint', nullable: false, default: 0 })
   stars: number;
 
-  @Column({ type: 'int4', nullable: false, default: 1 })
+  @Column({ type: 'bigint', nullable: false, default: 1 })
   carrotSize: number;
 
-  @Column({ type: 'int4', nullable: false, default: 1 })
+  @Column({ type: 'bigint', nullable: false, default: 1 })
   slotsCount: number;
 
   @Column({ type: 'bigint', nullable: false, default: 0 })

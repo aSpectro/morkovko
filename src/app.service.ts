@@ -47,11 +47,11 @@ export class AppService {
     try {
       const data: PlayerDTO[] = await this.playerRepository.find();
       for (const player of data) {
-        player.carrotCountBig = player.carrotCount;
-        player.pointsBig = player.points;
-        player.starsBig = player.stars;
-        player.carrotSizeBig = player.carrotSize;
-        player.slotsCountBig = player.slotsCount;
+        player.carrotCount = player.carrotCountBig;
+        player.points = player.pointsBig;
+        player.stars = player.starsBig;
+        player.carrotSize = player.carrotSizeBig;
+        player.slotsCount = player.slotsCountBig;
 
         this.savePlayer(player);
       }
