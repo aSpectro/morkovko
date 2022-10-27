@@ -10,7 +10,7 @@ export class FundEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'int4', nullable: false, default: 200000 })
+  @Column({ type: 'bigint', nullable: false, default: 200000 })
   fundSize: number;
 
   @Column({ type: 'boolean', nullable: false, default: true })

@@ -15,7 +15,7 @@ export class ReportEntity {
   @Column({ type: 'varchar', length: 200, nullable: false })
   userId: string;
 
-  @Column({ type: 'int4', nullable: false })
+  @Column({ type: 'bigint', nullable: false, default: 0 })
   fineCount: number;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

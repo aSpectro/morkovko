@@ -55,6 +55,9 @@ export interface PlayerDTO {
   carrotCount: number;
   points: number;
   carrotSize: number;
+  carrotCountBig: number;
+  pointsBig: number;
+  carrotSizeBig: number;
   carrotAvatar: string;
   pumpkinAvatar: string;
   lastWateringDate: Date;
@@ -69,6 +72,8 @@ export interface PlayerDTO {
   factorSpeed: number;
   slotsCount: number;
   stars: number;
+  slotsCountBig: number;
+  starsBig: number;
   dailyWateringCount: number;
   policeReportCount: number;
   wars: Wars;

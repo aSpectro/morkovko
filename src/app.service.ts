@@ -43,6 +43,24 @@ export class AppService {
   ) {}
 
   @Cron('0 * * * * *')
+  async migrate() {
+    try {
+      const data: PlayerDTO[] = await this.playerRepository.find();
+      for (const player of data) {
+        player.carrotCountBig = player.carrotCount;
+        player.pointsBig = player.points;
+        player.starsBig = player.stars;
+        player.carrotSizeBig = player.carrotSize;
+        player.slotsCountBig = player.slotsCount;
+
+        this.savePlayer(player);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // @Cron('0 * * * * *')
   async gameTick() {
     try {
       const data: PlayerDTO[] = await this.playerRepository.find();
